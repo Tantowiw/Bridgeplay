@@ -468,7 +468,7 @@ enum GameDefaults {
     }
 
     // KEY=VALUE with surrounding whitespace trimmed, as the run script reads it.
-    private static func assignment(_ line: Substring) -> (String, String)? {
+    static func assignment(_ line: Substring) -> (String, String)? {
         let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let equals = trimmed.firstIndex(of: "="), !trimmed.hasPrefix("#") else { return nil }
         return (String(trimmed[..<equals]), String(trimmed[trimmed.index(after: equals)...]))

@@ -9,6 +9,7 @@ struct PrefixesView: View {
     @State private var sortOrder = [KeyPathComparator(\PrefixRow.lastUsed, order: .reverse)]
     @State private var winetricksPrefix: WinePrefix?
     @State private var winetricksVerbs = ""
+    @State private var gameSettingsPrefix: WinePrefix?
 
     var body: some View {
         Group {
@@ -126,6 +127,9 @@ struct PrefixesView: View {
         } message: { prefix in
             Text("Enter the Winetricks verbs to install in \(prefix.title), separated by spaces.")
         }
+        .sheet(item: $gameSettingsPrefix) { prefix in
+            GameSettingsView(prefix: prefix)
+        }
     }
 
     private enum Question {
@@ -179,6 +183,12 @@ struct PrefixesView: View {
         }
         .disabled(model.selectedPrefix == nil || model.isBusy)
         .help("Run a program or open a Wine tool in the selected prefix.")
+
+        Button("Game Settings", systemImage: "slider.horizontal.3") {
+            gameSettingsPrefix = model.selectedPrefix
+        }
+        .disabled(model.selectedPrefix == nil)
+        .help("Choose the graphics, frame generation and other settings the selected game runs with.")
 
         Button("Reveal in Finder", systemImage: "folder") {
             if let prefix = model.selectedPrefix { model.reveal(prefix) }
@@ -341,6 +351,8 @@ struct PrefixesView: View {
         let targets = model.prefixes.filter { ids.contains($0.id) }
         Group {
             if let prefix = single(ids) {
+                Button("Game Settings…") { gameSettingsPrefix = prefix }
+                Divider()
                 toolButtons(for: prefix)
                 Divider()
                 Button("Reveal in Finder") { model.reveal(prefix) }

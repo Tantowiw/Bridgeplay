@@ -1244,6 +1244,22 @@
         }
       }
     },
+    "Adaptive (fills to display refresh)" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adattiva (riempie fino alla frequenza del display)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自适应（补足至显示器刷新率）"
+          }
+        }
+      }
+    },
     "Add" : {
       "localizations" : {
         "it" : {
@@ -3103,6 +3119,22 @@
         }
       }
     },
+    "Choose the graphics, frame generation and other settings the selected game runs with." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli la grafica, la generazione fotogrammi e le altre impostazioni con cui gira il gioco selezionato."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择所选游戏运行时使用的图形、帧生成和其他设置。"
+          }
+        }
+      }
+    },
     "Choose…" : {
       "localizations" : {
         "it" : {
@@ -3822,6 +3854,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "通过 MetalFX 提供 DLSS"
+          }
+        }
+      }
+    },
+    "Default" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Predefinito"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "默认"
+          }
+        }
+      }
+    },
+    "Default (%@)" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Predefinito (%@)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "默认（%@）"
           }
         }
       }
@@ -5022,6 +5086,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "游戏录制"
+          }
+        }
+      }
+    },
+    "Game Settings" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impostazioni del gioco"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "游戏设置"
+          }
+        }
+      }
+    },
+    "Game Settings…" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impostazioni del gioco…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "游戏设置…"
           }
         }
       }
@@ -8686,6 +8782,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "基于 CodeWeavers 的 Wine 和 Apple 的 Game Porting Toolkit 运行。"
+          }
+        }
+      }
+    },
+    "Saved in gamefixes/%@.conf. Launch options set for this game in Steam win over these." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvate in gamefixes/%@.conf. Le opzioni di avvio impostate per questo gioco in Steam hanno la precedenza su queste."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存在 gamefixes/%@.conf 中。在 Steam 中为此游戏设置的启动选项优先于这些设置。"
           }
         }
       }
