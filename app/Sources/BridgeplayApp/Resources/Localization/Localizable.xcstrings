@@ -8914,6 +8914,22 @@
         }
       }
     },
+    "Set to %@ by this game's Steam launch options, which win over this choice." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impostato su %@ dalle opzioni di avvio di Steam di questo gioco, che hanno la precedenza su questa scelta."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此游戏的 Steam 启动选项将其设为 %@，并优先于此处的选择。"
+          }
+        }
+      }
+    },
     "Set up Bridgeplay" : {
       "localizations" : {
         "it" : {

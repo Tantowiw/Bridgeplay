@@ -89,6 +89,78 @@ enum GameSettings {
         return lines.isEmpty ? "" : lines.joined(separator: "\n") + "\n"
     }
 
+    // What Steam launch options set, read as the run script reads them: the NAME=value words
+    // before %command%, the last of a name winning, NOTPROTON_<X> over BRIDGEPLAY_<X>, and
+    // BRIDGEPLAY_BACKEND over the panel's CX_GRAPHICS_BACKEND. Values the run script would
+    // ignore are left out; frame generation is spelled as the pickers spell it.
+    static func launchOptionValues(_ options: String) -> [Setting: String] {
+        let words = shellWords(options)
+        guard let command = words.firstIndex(of: "%command%") else { return [:] }
+        var env: [String: String] = [:]
+        for word in words[..<command] {
+            guard let equals = word.firstIndex(of: "="),
+                  word[..<equals].wholeMatch(of: #/[A-Za-z_][A-Za-z0-9_]*/#) != nil
+            else { continue }
+            let value = String(word[word.index(after: equals)...])
+            env[String(word[..<equals])] = value.isEmpty ? nil : value
+        }
+        func bridgeplay(_ name: String) -> String? { env["NOTPROTON_" + name] ?? env["BRIDGEPLAY_" + name] }
+
+        var found: [Setting: String] = [:]
+        if let backend = bridgeplay("BACKEND"), Setting.graphics.values.contains(backend) {
+            found[.graphics] = backend
+        } else if let raw = env["CX_GRAPHICS_BACKEND"]?.lowercased() {
+            let backend = ["opengl", "wine"].contains(raw) ? "wined3d" : raw
+            if Setting.graphics.values.contains(backend) { found[.graphics] = backend }
+        }
+        found[.metalHUD] = env["MTL_HUD_ENABLED"]
+        found[.msync] = env["WINEMSYNC"]
+        found[.highResolution] = bridgeplay("RETINA").map { $0 == "1" ? "1" : "0" }
+        found[.frameGeneration] = bridgeplay("FRAMEGEN").map {
+            let mode = $0.lowercased()
+            return mode == "1" ? "2" : ["off", "false", "no"].contains(mode) ? "0" : mode
+        }
+        for setting in [Setting.frameGenerationQuality, .frameGenerationUI, .frameGenerationFallback, .frameGenerationEngine] {
+            found[setting] = bridgeplay(setting.rawValue)?.lowercased()
+        }
+        return found
+    }
+
+    // Shell words as Steam's launch hook splits them: blanks separate, '…' is literal, and
+    // "…" or a bare backslash quote what follows.
+    static func shellWords(_ line: String) -> [String] {
+        var words: [String] = []
+        var word = ""
+        var inWord = false
+        var quote: Character?
+        var escaped = false
+        for c in line {
+            if escaped {
+                word.append(c)
+                escaped = false
+            } else if quote == "'" {
+                if c == "'" { quote = nil } else { word.append(c) }
+            } else if quote == "\"" {
+                if c == "\"" { quote = nil } else if c == "\\" { escaped = true } else { word.append(c) }
+            } else if c == "'" || c == "\"" {
+                quote = c
+                inWord = true
+            } else if c == "\\" {
+                escaped = true
+                inWord = true
+            } else if c == " " || c == "\t" || c == "\n" {
+                if inWord { words.append(word) }
+                word = ""
+                inWord = false
+            } else {
+                word.append(c)
+                inWord = true
+            }
+        }
+        if inWord { words.append(word) }
+        return words
+    }
+
     static func text(at url: URL) -> String {
         (try? String(contentsOf: url, encoding: .utf8)) ?? ""
     }

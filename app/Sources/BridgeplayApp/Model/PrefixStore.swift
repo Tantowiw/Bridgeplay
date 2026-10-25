@@ -164,8 +164,18 @@ enum PrefixStore {
     }
 
     static func shortcutNames(vdf data: Data) -> [String: String] {
+        shortcuts(vdf: data).compactMapValues { $0.name?.isEmpty == false ? $0.name : nil }
+    }
+
+    struct Shortcut: Equatable, Sendable {
+        var name: String?
+        var launchOptions: String?
+    }
+
+    // Every shortcut in shortcuts.vdf, by appid.
+    static func shortcuts(vdf data: Data) -> [String: Shortcut] {
         let bytes = [UInt8](data)
-        var names: [String: String] = [:]
+        var found: [String: Shortcut] = [:]
         var offset = 0
 
         func cString() -> String? {
@@ -185,6 +195,7 @@ enum PrefixStore {
             guard depth < 16 else { return false }
             var appID: UInt32?
             var appName: String?
+            var launchOptions: String?
             while offset < bytes.count {
                 let type = bytes[offset]
                 offset += 1
@@ -196,6 +207,7 @@ enum PrefixStore {
                 case 0x01:
                     guard let value = cString() else { return false }
                     if key == "appname" { appName = value }
+                    if key == "launchoptions" { launchOptions = value }
                 case 0x02:
                     guard bytes.count - offset >= 4 else { return false }
                     if key == "appid" {
@@ -210,12 +222,63 @@ enum PrefixStore {
                     return false
                 }
             }
-            if let appID, let appName, !appName.isEmpty { names[String(appID)] = appName }
+            if let appID { found[String(appID)] = Shortcut(name: appName, launchOptions: launchOptions) }
             return true
         }
 
         _ = map(depth: 0)
-        return names
+        return found
+    }
+
+    // The game's launch options as Steam last saved them: a shortcut's in shortcuts.vdf, a
+    // Steam game's in localconfig.vdf. "" when the game has none, nil when no account lists it.
+    // Several accounts can list the game; the file Steam wrote last is taken, since its
+    // account is the one that signed in last.
+    static func launchOptions(
+        appID: String, userdata: URL = SupportPaths.Steam.userData.appending(path: "userdata")
+    ) -> String? {
+        let isShortcut = UInt32(appID).map { $0 & 0x8000_0000 != 0 } ?? false
+        let accounts = (try? FileManager.default.contentsOfDirectory(
+            at: userdata, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]
+        )) ?? []
+        var newest: (date: Date, options: String)?
+        for account in accounts {
+            let file = account.appending(path: isShortcut ? "config/shortcuts.vdf" : "config/localconfig.vdf")
+            let options = isShortcut
+                ? (try? Data(contentsOf: file)).flatMap { shortcuts(vdf: $0)[appID].map { $0.launchOptions ?? "" } }
+                : (try? String(contentsOf: file, encoding: .utf8)).flatMap { localConfigLaunchOptions($0, appID: appID) }
+            guard let options else { continue }
+            let date = (try? file.resourceValues(forKeys: [.contentModificationDateKey]))?
+                .contentModificationDate ?? .distantPast
+            if newest.map({ date > $0.date }) ?? true { newest = (date, options) }
+        }
+        return newest?.options
+    }
+
+    // UserLocalConfigStore > Software > Valve > Steam > apps > <appid> > LaunchOptions.
+    static func localConfigLaunchOptions(_ text: String, appID: String) -> String? {
+        let app = ["software", "valve", "steam", "apps", appID.lowercased()]
+        var path: [String] = []
+        var section: String?
+        var options: String?
+        for line in text.split(separator: "\n") {
+            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            let inApp = path.map { $0.lowercased() }.suffix(app.count).elementsEqual(app)
+            if trimmed == "{" {
+                path.append(section ?? "")
+                section = nil
+            } else if trimmed == "}" {
+                if inApp { return options ?? "" }
+                _ = path.popLast()
+            } else {
+                let fields = quotedFields(line)
+                if fields.count == 1 { section = fields[0] }
+                if fields.count >= 2, inApp, fields[0].caseInsensitiveCompare("LaunchOptions") == .orderedSame {
+                    options = fields[1]
+                }
+            }
+        }
+        return nil
     }
 
     static func installDirectory(of prefix: WinePrefix) -> URL? {
@@ -229,21 +292,26 @@ enum PrefixStore {
         let manifest = library.steamapps.appending(path: "appmanifest_\(appID).acf")
         guard let text = try? String(contentsOf: manifest, encoding: .utf8) else { return nil }
         for line in text.split(separator: "\n") {
-            // Steam escapes \" \\ \n and \t inside quoted values.
-            let fields = line.matches(of: #/"((?:[^"\\]|\\.)*)"/#)
-                .map {
-                    String($0.1).replacing(#/\\(.)/#) { escape -> String in
-                        switch escape.1 {
-                        case "n": "\n"
-                        case "t": "\t"
-                        case "\\", "\"": String(escape.1)
-                        default: String(escape.0)
-                        }
-                    }
-                }
+            let fields = quotedFields(line)
             if fields.count >= 2, fields[0] == key { return fields[1] }
         }
         return nil
+    }
+
+    // The quoted strings on a line of Steam's text KeyValues. Steam escapes \" \\ \n and \t
+    // inside them.
+    private static func quotedFields(_ line: Substring) -> [String] {
+        line.matches(of: #/"((?:[^"\\]|\\.)*)"/#)
+            .map {
+                String($0.1).replacing(#/\\(.)/#) { escape -> String in
+                    switch escape.1 {
+                    case "n": "\n"
+                    case "t": "\t"
+                    case "\\", "\"": String(escape.1)
+                    default: String(escape.0)
+                    }
+                }
+            }
     }
 
     static let backupPrefix = "pfx.previous"

@@ -48,6 +48,35 @@ import Testing
         }
     }
 
+    @Test func readsLaunchOptionsAsTheRunScriptDoes() {
+        func read(_ options: String) -> [GameSettings.Setting: String] { GameSettings.launchOptionValues(options) }
+        #expect(read("BRIDGEPLAY_FRAMEGEN=2 %command%") == [.frameGeneration: "2"])
+        #expect(read("BRIDGEPLAY_FRAMEGEN=2 BRIDGEPLAY_FRAMEGEN=3 %command%") == [.frameGeneration: "3"])
+        #expect(read("BRIDGEPLAY_FRAMEGEN=2 NOTPROTON_FRAMEGEN=Adaptive %command%") == [.frameGeneration: "adaptive"])
+        #expect(read("BRIDGEPLAY_FRAMEGEN=1 %command%") == [.frameGeneration: "2"])
+        #expect(read("BRIDGEPLAY_FRAMEGEN=off BRIDGEPLAY_FRAMEGEN_QUALITY=Quality %command%")
+            == [.frameGeneration: "0", .frameGenerationQuality: "quality"])
+        #expect(read("WINEMSYNC=0 MTL_HUD_ENABLED=1 BRIDGEPLAY_RETINA=0 %command%")
+            == [.msync: "0", .metalHUD: "1", .highResolution: "0"])
+        // Quotes and arguments after %command% are the shell's and the game's.
+        #expect(read(#""BRIDGEPLAY_FRAMEGEN=3" FOO='a b' %command% -title "x y" WINEMSYNC=0"#) == [.frameGeneration: "3"])
+    }
+
+    @Test func readsTheGraphicsChoiceInTheRunScriptsOrder() {
+        func graphics(_ options: String) -> String? { GameSettings.launchOptionValues(options)[.graphics] }
+        #expect(graphics("CX_GRAPHICS_BACKEND=DXMT %command%") == "dxmt")
+        #expect(graphics("BRIDGEPLAY_BACKEND=dxvk CX_GRAPHICS_BACKEND=dxmt %command%") == "dxvk")
+        // A BRIDGEPLAY_BACKEND the run script ignores leaves the panel's choice in charge.
+        #expect(graphics("BRIDGEPLAY_BACKEND=metal CX_GRAPHICS_BACKEND=opengl %command%") == "wined3d")
+        #expect(graphics("CX_GRAPHICS_BACKEND=vulkan %command%") == nil)
+    }
+
+    @Test func ignoresLaunchOptionsWithoutCommand() {
+        #expect(GameSettings.launchOptionValues("BRIDGEPLAY_FRAMEGEN=2 -novid").isEmpty)
+        #expect(GameSettings.launchOptionValues("%command% BRIDGEPLAY_FRAMEGEN=2").isEmpty)
+        #expect(GameSettings.launchOptionValues("").isEmpty)
+    }
+
     @Test func writesReadsBackAndRemovesAFile() throws {
         let dir = FileManager.default.temporaryDirectory.appending(path: "gamesettings-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: dir) }

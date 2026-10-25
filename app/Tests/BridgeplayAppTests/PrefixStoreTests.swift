@@ -203,6 +203,88 @@ struct PrefixStoreTests {
         #expect(PrefixStore.shortcutNames(vdf: Data(vdf.prefix(40))).isEmpty)
     }
 
+    @Test("A Steam game's launch options come from its own entry in localconfig.vdf")
+    func readsLocalConfigLaunchOptions() {
+        let text = """
+        "UserLocalConfigStore"
+        {
+        \t"apps"
+        \t{
+        \t\t"4474710"
+        \t\t{
+        \t\t\t"LaunchOptions"\t\t"WRONG %command%"
+        \t\t}
+        \t}
+        \t"Software"
+        \t{
+        \t\t"Valve"
+        \t\t{
+        \t\t\t"Steam"
+        \t\t\t{
+        \t\t\t\t"apps"
+        \t\t\t\t{
+        \t\t\t\t\t"4474710"
+        \t\t\t\t\t{
+        \t\t\t\t\t\t"cloud"
+        \t\t\t\t\t\t{
+        \t\t\t\t\t\t\t"LaunchOptions"\t\t"WRONG TOO"
+        \t\t\t\t\t\t}
+        \t\t\t\t\t\t"LaunchOptions"\t\t"BRIDGEPLAY_FRAMEGEN=2 %command% -title \\"A B\\""
+        \t\t\t\t\t}
+        \t\t\t\t\t"2203230"
+        \t\t\t\t\t{
+        \t\t\t\t\t\t"LastPlayed"\t\t"1"
+        \t\t\t\t\t}
+        \t\t\t\t}
+        \t\t\t}
+        \t\t}
+        \t}
+        }
+        """
+        #expect(PrefixStore.localConfigLaunchOptions(text, appID: "4474710") == #"BRIDGEPLAY_FRAMEGEN=2 %command% -title "A B""#)
+        #expect(PrefixStore.localConfigLaunchOptions(text, appID: "2203230") == "")
+        #expect(PrefixStore.localConfigLaunchOptions(text, appID: "1") == nil)
+    }
+
+    @Test("Launch options come from the account Steam wrote last, for shortcuts and Steam games")
+    func readsTheNewestAccountsLaunchOptions() throws {
+        let dir = try scratchDirectory("pfx")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let userdata = dir.appending(path: "userdata")
+
+        func shortcut(_ options: String) -> Data {
+            var vdf: [UInt8] = [0x00] + Array("shortcuts".utf8) + [0] + [0x00] + Array("0".utf8) + [0]
+            vdf += [0x02] + Array("appid".utf8) + [0] + withUnsafeBytes(of: UInt32(0xe23c_c6df).littleEndian, Array.init)
+            vdf += [0x01] + Array("AppName".utf8) + [0] + Array("SuperRumble Launcher".utf8) + [0]
+            vdf += [0x01] + Array("LaunchOptions".utf8) + [0] + Array(options.utf8) + [0]
+            return Data(vdf + [0x08, 0x08, 0x08])
+        }
+        func localConfig(_ options: String) -> String {
+            "\"UserLocalConfigStore\"\n{\n\"Software\"\n{\n\"Valve\"\n{\n\"Steam\"\n{\n\"apps\"\n{\n"
+                + "\"4474710\"\n{\n\"LaunchOptions\"\t\t\"\(options)\"\n}\n}\n}\n}\n}\n}\n"
+        }
+        let old = Date(timeIntervalSinceNow: -3600)
+        for (account, options, date) in [("111", "MTL_HUD_ENABLED=1 %command%", old), ("222", "", Date())] {
+            let config = userdata.appending(path: "\(account)/config")
+            try FileManager.default.createDirectory(at: config, withIntermediateDirectories: true)
+            for (name, data) in [("shortcuts.vdf", shortcut(options)), ("localconfig.vdf", Data(localConfig(options).utf8))] {
+                let file = config.appending(path: name)
+                try data.write(to: file)
+                try FileManager.default.setAttributes([.modificationDate: date], ofItemAtPath: file.path(percentEncoded: false))
+            }
+        }
+
+        // The account that signed in last cleared them, so the older account's do not apply.
+        #expect(PrefixStore.launchOptions(appID: "3795633887", userdata: userdata) == "")
+        #expect(PrefixStore.launchOptions(appID: "4474710", userdata: userdata) == "")
+        #expect(PrefixStore.launchOptions(appID: "9", userdata: userdata) == nil)
+        try FileManager.default.setAttributes(
+            [.modificationDate: Date(timeIntervalSinceNow: -7200)],
+            ofItemAtPath: userdata.appending(path: "222/config/localconfig.vdf").path(percentEncoded: false))
+        #expect(PrefixStore.launchOptions(appID: "4474710", userdata: userdata) == "MTL_HUD_ENABLED=1 %command%")
+        #expect(PrefixStore.shortcutNames(vdf: shortcut("")) == ["3795633887": "SuperRumble Launcher"])
+    }
+
     @Test("Sizing a prefix stops at a symlink instead of walking through it")
     func doesNotFollowLinksOutOfThePrefix() throws {
         let dir = try scratchDirectory("pfx")
