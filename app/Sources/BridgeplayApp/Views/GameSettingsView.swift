@@ -9,6 +9,7 @@ struct GameSettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var values: [GameSettings.Setting: String] = [:]
     @State private var inherited: [GameSettings.Setting: String] = [:]
+    @State private var steam: [GameSettings.Setting: String] = [:]
     @State private var saveError: String?
 
     var body: some View {
@@ -61,12 +62,20 @@ struct GameSettingsView: View {
                 Text(Self.label(setting, value)).tag(value)
             }
         } label: {
-            title
+            VStack(alignment: .leading, spacing: 2) {
+                title
+                if let value = steam[setting] {
+                    Text("Set to \(Self.label(setting, value)) by this game's Steam launch options, which win over this choice.")
+                        .font(BP.sans(11))
+                        .foregroundStyle(BP.orange)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
         }
     }
 
     private func effective(_ setting: GameSettings.Setting) -> String? {
-        values[setting] ?? inherited[setting] ?? setting.builtInDefault
+        steam[setting] ?? values[setting] ?? inherited[setting] ?? setting.builtInDefault
     }
 
     // The choice that writes no line, named after what the game then gets.
@@ -101,6 +110,7 @@ struct GameSettingsView: View {
     private func load() {
         let own = GameSettings.text(at: GameSettings.file(for: prefix.appID))
         let lower = [GameDefaults.file, GameSettings.shippedFile(for: prefix.appID)].map(GameSettings.text(at:))
+        steam = GameSettings.launchOptionValues(PrefixStore.launchOptions(appID: prefix.appID) ?? "")
         for setting in GameSettings.Setting.allCases {
             values[setting] = GameSettings.value(setting, in: own).flatMap { setting.values.contains($0) ? $0 : nil }
             inherited[setting] = GameSettings.inherited(setting, from: lower)
