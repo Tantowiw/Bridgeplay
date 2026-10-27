@@ -50,6 +50,7 @@ extension PrefixTools {
         wineTimeout: DispatchTimeInterval = wineTimeLimit,
         progress: (RebuildPhase) -> Void = { _ in }
     ) throws -> URL? {
+        try PrefixTools.refuseIfGame(prefix, step: String(localized: "Recreate prefix"))
         guard let claim = PrefixStore.claim(prefix) else {
             throw StepFailure(
                 step: String(localized: "Recreate prefix"),
