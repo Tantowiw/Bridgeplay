@@ -100,35 +100,32 @@ final class GamesModel {
         }
     }
 
-    // The program Play starts, inside the game's prefix, where its installer put it.
+    // The program Play starts: where the game's installer put it in its prefix, or a game
+    // folder that was unpacked somewhere else.
     func chooseProgram(for game: StandaloneGame) async {
-        let prefix = GameStore.prefix(of: game, in: root)
-        guard hasPrefix(game) else {
-            report = FailureReport([StepFailure(
-                step: String(localized: "Choose Program"),
-                detail: String(localized: "\(game.name) has no prefix yet. Run its installer first."))])
-            return
-        }
         let panel = Self.programPanel()
         panel.prompt = String(localized: "Choose")
         panel.message = String(localized: "Choose the program that starts \(game.name).")
-        let programs = prefix.pfx.appending(path: "drive_c/Program Files (x86)")
-        panel.directoryURL = FileManager.default.fileExists(atPath: programs.path(percentEncoded: false))
-            ? programs : prefix.pfx.appending(path: "drive_c")
+        panel.directoryURL = programFolder(for: game)
         guard panel.runModal() == .OK, let picked = panel.url else { return }
         await setProgram(picked, for: game)
     }
 
-    func setProgram(_ picked: URL, for game: StandaloneGame) async {
-        forgetOutcome()
-        guard let path = GameStore.relativePath(of: picked, in: game, root: root) else {
-            report = FailureReport([StepFailure(
-                step: String(localized: "Choose Program"),
-                detail: String(localized: "\(picked.lastPathComponent) is not inside the prefix of \(game.name). Choose a program its installer put there."))])
-            return
+    // The current program's folder, then the prefix's Program Files, then Downloads.
+    func programFolder(for game: StandaloneGame) -> URL? {
+        let files = FileManager.default
+        if let current = GameStore.executableURL(of: game, in: root)?.deletingLastPathComponent(),
+           files.fileExists(atPath: current.path(percentEncoded: false)) {
+            return current
         }
+        let programs = GameStore.prefix(of: game, in: root).pfx.appending(path: "drive_c/Program Files (x86)")
+        if files.fileExists(atPath: programs.path(percentEncoded: false)) { return programs }
+        return files.urls(for: .downloadsDirectory, in: .userDomainMask).first
+    }
+
+    func setProgram(_ picked: URL, for game: StandaloneGame) async {
         var changed = game
-        changed.executable = path
+        changed.executable = GameStore.storedPath(of: picked, in: game, root: root)
         act {
             try GameStore.save(changed, in: root)
             return String(localized: "Play now starts \(picked.lastPathComponent).")

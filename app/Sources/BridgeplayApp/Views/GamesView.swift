@@ -75,7 +75,7 @@ struct GamesView: View {
             Button("Cancel", role: .cancel) { model.removing = nil }
                 .keyboardShortcut(.defaultAction)
         } message: {
-            Text("This deletes the game's folder, with the game installed in its prefix and any saves kept there. Back up the prefix in Prefixes first to keep them.")
+            Text("This deletes the game's prefix, with anything installed or saved in it. A game folder outside the prefix, such as one in Downloads, is kept. Back up the prefix in Prefixes first to keep it.")
         }
     }
 
@@ -96,7 +96,7 @@ struct GamesView: View {
             if let game { Task { await model.chooseProgram(for: game) } }
         }
         .disabled(game == nil)
-        .help("Choose the program Play starts, such as the game's launcher.")
+        .help("Choose the program Play starts, such as the game's launcher, inside its prefix or in a folder of its own.")
 
         Button("Game Settings", systemImage: "slider.horizontal.3") {
             if let game { gameSettings = GameStore.prefix(of: game) }

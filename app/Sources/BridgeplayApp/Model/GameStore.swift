@@ -8,8 +8,9 @@ import Foundation
 struct StandaloneGame: Sendable, Hashable, Identifiable {
     let id: String
     var name: String
-    // The program Play starts, relative to the game's folder (pfx/drive_c/…), so the folder
-    // can move with the game in it.
+    // The program Play starts. Inside the game's folder it is kept relative to it
+    // (pfx/drive_c/…), so the folder can move with the game in it. A game unpacked somewhere
+    // else, such as Downloads, is kept by its absolute path.
     var executable: String?
     var arguments: [String] = []
     // The compatibility tool Play runs the game with, by name.
@@ -128,12 +129,19 @@ enum GameStore {
         AppLog.note("games: removed \(game.id)")
     }
 
-    // nil when the path is absolute or climbs out of the game's folder.
+    // nil when a relative path climbs out of the game's folder.
     static func executableURL(of game: StandaloneGame, in root: URL = SupportPaths.games) -> URL? {
-        guard let path = game.executable, !path.isEmpty, !path.hasPrefix("/"),
-              !path.split(separator: "/").contains("..")
-        else { return nil }
+        guard let path = game.executable, !path.isEmpty else { return nil }
+        if path.hasPrefix("/") { return URL(filePath: path, directoryHint: .notDirectory) }
+        guard !path.split(separator: "/").contains("..") else { return nil }
         return folder(of: game.id, in: root).appending(path: path, directoryHint: .notDirectory)
+    }
+
+    // How a program the user picked is stored: relative inside the game's folder, absolute
+    // anywhere else.
+    static func storedPath(of executable: URL, in game: StandaloneGame, root: URL = SupportPaths.games) -> String {
+        relativePath(of: executable, in: game, root: root)
+            ?? executable.standardizedFileURL.path(percentEncoded: false)
     }
 
     // The part of the path to store for a program the user picked inside the game's folder.

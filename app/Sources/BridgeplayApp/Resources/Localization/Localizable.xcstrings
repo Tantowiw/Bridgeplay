@@ -305,22 +305,6 @@
         }
       }
     },
-    "%@ has no prefix yet. Run its installer first." : {
-      "localizations" : {
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ non ha ancora un prefisso. Esegui prima il suo programma di installazione."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ 还没有游戏容器。请先运行它的安装程序。"
-          }
-        }
-      }
-    },
     "%@ has no run script at %@. Set up the compatibility tool again." : {
       "localizations" : {
         "it" : {
@@ -509,22 +493,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ 不是有效的 CrossOver 应用。"
-          }
-        }
-      }
-    },
-    "%@ is not inside the prefix of %@. Choose a program its installer put there." : {
-      "localizations" : {
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ non si trova nel prefisso di %2$@. Scegli un programma che il suo programma di installazione ha messo lì."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ 不在“%2$@”的游戏容器中。请选择其安装程序放在那里的程序。"
           }
         }
       }
@@ -3247,22 +3215,6 @@
         }
       }
     },
-    "Choose Program" : {
-      "localizations" : {
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scegli il programma"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "选择程序"
-          }
-        }
-      }
-    },
     "Choose Program…" : {
       "localizations" : {
         "it" : {
@@ -3327,18 +3279,18 @@
         }
       }
     },
-    "Choose the program Play starts, such as the game's launcher." : {
+    "Choose the program Play starts, such as the game's launcher, inside its prefix or in a folder of its own." : {
       "localizations" : {
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Scegli il programma che Gioca avvia, ad esempio il launcher del gioco."
+            "value" : "Scegli il programma che Gioca avvia, ad esempio il launcher del gioco, nel suo prefisso o in una cartella a parte."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "选择“开始游戏”要启动的程序，例如游戏的启动器。"
+            "value" : "选择“开始游戏”要启动的程序，例如游戏的启动器，可以在它的游戏容器中，也可以在单独的文件夹中。"
           }
         }
       }
@@ -11797,18 +11749,18 @@
         }
       }
     },
-    "This deletes the game's folder, with the game installed in its prefix and any saves kept there. Back up the prefix in Prefixes first to keep them." : {
+    "This deletes the game's prefix, with anything installed or saved in it. A game folder outside the prefix, such as one in Downloads, is kept. Back up the prefix in Prefixes first to keep it." : {
       "localizations" : {
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Questo elimina la cartella del gioco, con il gioco installato nel suo prefisso e i salvataggi lì conservati. Per tenerli, esegui prima il backup del prefisso in Prefissi."
+            "value" : "Questo elimina il prefisso del gioco, con tutto ciò che vi è installato o salvato. Una cartella del gioco fuori dal prefisso, ad esempio in Download, viene conservata. Per tenerlo, esegui prima il backup del prefisso in Prefissi."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "这会删除游戏的文件夹，包括安装在其游戏容器中的游戏和保存在那里的存档。如需保留，请先在“游戏容器”中备份它。"
+            "value" : "这会删除游戏的游戏容器，以及其中安装或保存的所有内容。游戏容器之外的游戏文件夹（例如“下载”中的文件夹）会被保留。如需保留游戏容器，请先在“游戏容器”中备份它。"
           }
         }
       }
