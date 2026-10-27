@@ -52,8 +52,8 @@ struct GameStoreTests {
         #expect(GameStore.game(id: "5000000099", in: root) == nil)
     }
 
-    @Test("The program is kept relative to the game's folder and cannot leave it")
-    func keepsTheProgramInsideTheFolder() throws {
+    @Test("A program inside the game's folder is kept relative to it, one elsewhere by its full path")
+    func keepsTheProgramsPath() throws {
         let root = try scratchDirectory("games")
         defer { try? FileManager.default.removeItem(at: root) }
         var game = try GameStore.add(name: "Game", in: root)
@@ -64,10 +64,16 @@ struct GameStoreTests {
 
         game.executable = "pfx/drive_c/Game/Game.exe"
         #expect(GameStore.executableURL(of: game, in: root)?.lastPathComponent == "Game.exe")
-        for escaping in ["/Applications/Game.exe", "pfx/../../5000000002/pfx/x.exe", ""] {
+        for escaping in ["pfx/../../5000000002/pfx/x.exe", ""] {
             game.executable = escaping
             #expect(GameStore.executableURL(of: game, in: root) == nil)
         }
+
+        let unpacked = root.appending(path: "Downloads/DMW/DMLauncher.exe")
+        #expect(GameStore.storedPath(of: exe, in: game, root: root) == "pfx/drive_c/Game/Game.exe")
+        #expect(GameStore.storedPath(of: unpacked, in: game, root: root) == unpacked.path(percentEncoded: false))
+        game.executable = GameStore.storedPath(of: unpacked, in: game, root: root)
+        #expect(GameStore.executableURL(of: game, in: root) == URL(filePath: unpacked.path(percentEncoded: false)))
     }
 
     @Test("Play runs the tool's run script standalone, with the game's folder as compatdata")
@@ -107,6 +113,17 @@ struct GameStoreTests {
             "STEAM_COMPAT_DATA_PATH": GameStore.folder(of: game.id, in: root).path(percentEncoded: false),
             "STEAM_COMPAT_INSTALL_PATH": exe.deletingLastPathComponent().path(percentEncoded: false),
         ])
+
+        // A game unpacked outside the folder starts from where it is, with its arguments.
+        let unpacked = work.appending(path: "Downloads/DMW/DMLauncher.exe")
+        try FileManager.default.createDirectory(at: unpacked.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try Data().write(to: unpacked)
+        var outside = game
+        outside.executable = GameStore.storedPath(of: unpacked, in: game, root: root)
+        let played = try GameStore.launch(outside, tool: tool, root: root, compatTools: tools, environment: inherited)
+        #expect(played.arguments == ["waitforexitandrun", unpacked.path(percentEncoded: false), "-lang", "en"])
+        #expect(played.environment["STEAM_COMPAT_INSTALL_PATH"] == unpacked.deletingLastPathComponent().path(percentEncoded: false))
+        #expect(played.environment["STEAM_COMPAT_DATA_PATH"] == launch.environment["STEAM_COMPAT_DATA_PATH"])
 
         // An installer from outside the folder runs in the same prefix, without the game's arguments.
         let installer = work.appending(path: "Downloads/Setup.exe")
@@ -207,7 +224,7 @@ struct GamesModelTests {
         var calls: [(String, URL?)] = []
     }
 
-    @Test("A program is kept only from inside the game's prefix, and Play starts the game")
+    @Test("A program is kept from inside the game's prefix or from anywhere else, and Play starts the game")
     func choosesTheProgramAndPlays() async throws {
         let root = try scratchDirectory("games")
         defer { try? FileManager.default.removeItem(at: root) }
@@ -223,15 +240,22 @@ struct GamesModelTests {
         try FileManager.default.createDirectory(at: inside.deletingLastPathComponent(), withIntermediateDirectories: true)
         try Data().write(to: inside)
 
-        await model.setProgram(root.appending(path: "Elsewhere.exe"), for: game)
-        #expect(model.report != nil)
-        #expect(model.program(model.games[0]) == nil)
+        let elsewhere = root.appending(path: "Downloads/DMW/DMLauncher.exe")
+        try FileManager.default.createDirectory(at: elsewhere.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try Data().write(to: elsewhere)
+        await model.setProgram(elsewhere, for: game)
+        #expect(model.report == nil)
+        #expect(model.games[0].executable == elsewhere.path(percentEncoded: false))
+        #expect(model.programFolder(for: model.games[0])?.path(percentEncoded: false)
+            == elsewhere.deletingLastPathComponent().path(percentEncoded: false))
 
         await model.setProgram(inside, for: game)
         #expect(model.report == nil)
         let saved = model.games[0]
         #expect(saved.executable == "pfx/drive_c/Game/Launcher.exe")
         #expect(model.program(saved) == "Launcher.exe")
+        #expect(model.programFolder(for: saved)?.path(percentEncoded: false)
+            == inside.deletingLastPathComponent().path(percentEncoded: false))
 
         model.play(saved)
         #expect(started.calls.count == 1)
