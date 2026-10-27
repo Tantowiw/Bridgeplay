@@ -13,6 +13,7 @@ struct SetupPreviewApp: App {
 
     @State private var status = SystemStatus()
     @State private var prefixes = PrefixesModel()
+    @State private var games = GamesModel()
     @State private var pane: Pane = .status
     private static let mainFirst = CommandLine.arguments.contains("--main")
     private let preview: SetupAssistant.Preview =
@@ -45,6 +46,7 @@ struct SetupPreviewApp: App {
             RootView(pane: $pane)
                 .environment(status)
                 .environment(prefixes)
+                .environment(games)
                 .frame(minWidth: 800, minHeight: 600)
         }
         .defaultSize(width: 900, height: 760)

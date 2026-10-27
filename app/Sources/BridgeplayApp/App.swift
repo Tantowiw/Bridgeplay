@@ -6,6 +6,7 @@ struct BridgeplayApp: App {
 
     @State private var status = SystemStatus()
     @State private var prefixes = PrefixesModel()
+    @State private var games = GamesModel()
     @State private var pane: Pane = .status
     @State private var showsSetup = false
     private let updater = AppUpdater.shared
@@ -15,8 +16,12 @@ struct BridgeplayApp: App {
             RootView(pane: $pane)
                 .environment(status)
                 .environment(prefixes)
+                .environment(games)
                 .frame(minWidth: 800, minHeight: 600)
-                .onChange(of: pane) { prefixes.forgetOutcome() }
+                .onChange(of: pane) {
+                    prefixes.forgetOutcome()
+                    games.forgetOutcome()
+                }
                 .onChange(of: status.snapshot?.installedRunners.map(\.id)) {
                     if prefixes.hasLoaded { Task { await prefixes.load() } }
                 }
@@ -71,14 +76,16 @@ struct BridgeplayApp: App {
         CommandGroup(after: .sidebar) {
             Button("Status") { pane = .status }
                 .keyboardShortcut("1", modifiers: .command)
-            Button("Prefixes") { pane = .prefixes }
+            Button("Games") { pane = .games }
                 .keyboardShortcut("2", modifiers: .command)
-            Button("Prefix Backups") { pane = .backups }
+            Button("Prefixes") { pane = .prefixes }
                 .keyboardShortcut("3", modifiers: .command)
-            Button("Guide") { pane = .guide }
+            Button("Prefix Backups") { pane = .backups }
                 .keyboardShortcut("4", modifiers: .command)
-            Button("Game Defaults") { pane = .gameDefaults }
+            Button("Guide") { pane = .guide }
                 .keyboardShortcut("5", modifiers: .command)
+            Button("Game Defaults") { pane = .gameDefaults }
+                .keyboardShortcut("6", modifiers: .command)
 
             Divider()
 
@@ -86,12 +93,13 @@ struct BridgeplayApp: App {
                 Task {
                     switch pane {
                     case .status, .guide, .gameDefaults: await status.refresh()
+                    case .games: await games.load()
                     case .prefixes, .backups: await prefixes.load()
                     }
                 }
             }
             .keyboardShortcut("r", modifiers: .command)
-            .disabled(pane == .status || pane == .guide || pane == .gameDefaults ? !status.isIdle : prefixes.isLoading)
+            .disabled(pane == .status || pane == .guide || pane == .gameDefaults ? !status.isIdle : pane == .games ? games.isLoading : prefixes.isLoading)
 
             Divider()
         }
