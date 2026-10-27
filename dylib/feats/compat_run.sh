@@ -21,6 +21,17 @@ for np_name in $(env | LC_ALL=C sed -n 's/^BRIDGEPLAY_\([A-Z0-9_]*\)=.*/\1/p'); 
   fi
 done
 
+# BRIDGEPLAY_STANDALONE=1: Bridgeplay starts this game itself, with no Steam involved. Steam's
+# client is then never looked up, so nothing is read from its folders or copied into them and
+# no Steam.dll link lands beside the game. Of the Steam bridge only steam.exe is staged: it still
+# starts the game, because it waits for every process the game starts, such as a launcher that
+# hands over to its client and exits.
+np_standalone=0
+if [ "${NOTPROTON_STANDALONE:-0}" = 1 ]; then
+  np_standalone=1
+  unset -v STEAM_COMPAT_CLIENT_INSTALL_PATH STEAM_DYLD_INSERT_LIBRARIES
+fi
+
 case "$verb" in
   getcompatpath)
     printf '%s\n' "$STEAM_COMPAT_DATA_PATH"
@@ -2569,6 +2580,7 @@ verify_runner() {
   done
 }
 install_lsteamclient_trigger() {
+  [ "$np_standalone" != 1 ] || return 0
   src="$bridge_src/i386-windows/lsteamclient.dll"
   dst="$WINEPREFIX/drive_c/windows/syswow64/lsteamclient.dll"
   [ -f "$src" ] && [ -d "$WINEPREFIX/drive_c/windows/syswow64" ] || return 0
@@ -2603,6 +2615,7 @@ install_runner_builtins() {
 
 # A fix to match Proton
 install_legacy_steam_dll() {
+  [ "$np_standalone" != 1 ] || return 0
   src="$bridge_src/legacycompat/Steam.dll"
   dst="$WINEPREFIX/drive_c/windows/syswow64/Steam.dll"
   [ -f "$src" ] && [ -d "$WINEPREFIX/drive_c/windows/syswow64" ] || return 0
@@ -2651,6 +2664,10 @@ link_legacy_steam_dll() {
 
 bridge_files="steamclient64.dll steamclient.dll tier0_s64.dll vstdlib_s64.dll tier0_s.dll vstdlib_s.dll"
 bridge_files="$bridge_files lsteamclient.dll lsteamclient.so steam.exe"
+# A standalone game has no Steam client. With steamclient64.dll staged, steam.exe would load the
+# bridge, which stops the game when no native client loads; without it steam.exe skips its Steam
+# setup and still waits for the game's processes. Copies a Steam launch left are pruned.
+[ "$np_standalone" != 1 ] || bridge_files="steam.exe"
 # A clone cannot cross drives, so a prefix on another drive clones from a copy of the
 # bridge kept beside that drive's templates.
 bridge_origin() {
@@ -2736,7 +2753,7 @@ if [ -d "$bridge_src" ] && [ -n "$WINEPREFIX" ]; then
   vc_overrides=$(native_vc_runtime)
   export WINEDLLOVERRIDES="${vc_overrides}${WINEDLLOVERRIDES:+$WINEDLLOVERRIDES;}steamclient=n;steamclient64=n;lsteamclient=b"
   native_client="$STEAM_COMPAT_CLIENT_INSTALL_PATH"
-  if [ -z "$native_client" ]; then
+  if [ -z "$native_client" ] && [ "$np_standalone" != 1 ]; then
     native_client="$HOME/Library/Application Support/Steam/Steam.AppBundle/Steam/Contents/MacOS"
     export STEAM_COMPAT_CLIENT_INSTALL_PATH="$native_client"
   fi
@@ -3069,7 +3086,11 @@ else
       args:*) set -- "$@" "$arg" ;;
     esac
   done
-  echo "launching bundle directly so input permission stays with Steam" >> "$log" 2>&1 || true
+  if [ "$np_standalone" = 1 ]; then
+    echo "launching bundle directly so input permission stays with the app that started it" >> "$log" 2>&1 || true
+  else
+    echo "launching bundle directly so input permission stays with Steam" >> "$log" 2>&1 || true
+  fi
   env -i HOME="$HOME" USER="$USER" LOGNAME="$LOGNAME" SHELL="$SHELL" TMPDIR="$TMPDIR" \
     __CF_USER_TEXT_ENCODING="$__CF_USER_TEXT_ENCODING" "$@" >> "$log" 2>&1 &
 fi
