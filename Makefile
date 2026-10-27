@@ -87,7 +87,7 @@ DEPS := $(OBJS:.o=.d)
         tests-list overlay-shim overlay-shim-install overlay-shim-tests \
         overlay-shim-bench iconmaker icon \
         appinfo helpers-install ntdll-resolve detourcheck bridge runcheck compatcheck \
-        compatsvc-check prefixstate-check shortcutcheck scriptcheck envcheck buildcheck settingscheck routecheck bridgecheck envpasscheck prefixnotecheck powernotecheck exitcheck anticheatcheck launchprogresscheck gamedrivecheck fontlinkcheck \
+        compatsvc-check prefixstate-check shortcutcheck scriptcheck envcheck buildcheck settingscheck routecheck bridgecheck standalonecheck envpasscheck prefixnotecheck powernotecheck exitcheck anticheatcheck launchprogresscheck gamedrivecheck fontlinkcheck \
         gamefixescheck launchercheck padcheck mappingscheck launch-shell activatecheck stamp-check versioncheck ledgercheck stablecheck betacheck cicheck g1check compat-reported-check FORCE
 
 APP_PAYLOAD := app/Sources/BridgeplayApp/Resources/payload
@@ -176,6 +176,10 @@ routecheck:
 bridgecheck:
 	@if [ ! -f dylib/tests/bridgecheck.sh ]; then $(call SKIP,bridgecheck,dylib/tests/bridgecheck.sh); exit 0; fi; \
 	sh dylib/tests/bridgecheck.sh dylib/feats/compat_run.sh
+
+standalonecheck:
+	@if [ ! -f dylib/tests/standalonecheck.sh ]; then $(call SKIP,standalonecheck,dylib/tests/standalonecheck.sh); exit 0; fi; \
+	sh dylib/tests/standalonecheck.sh dylib/feats/compat_run.sh
 
 envpasscheck:
 	@if [ ! -f dylib/tests/envpasscheck.sh ]; then \
@@ -983,7 +987,7 @@ np-inventory-check:
 CI_CHECKS := mincheck l10ncheck \
 	sigcheck callscheck np-test-batch-check webpatch-fixtures peicon-fixtures panel-behavior spawn-env \
 	activatecheck compat-reported-import-check compatcheck compatsvc-check quicksettings-check displayratecheck prefixstate-check shortcutcheck launch-shell envcheck \
-	buildcheck settingscheck routecheck bridgecheck envpasscheck prefixnotecheck powernotecheck exitcheck anticheatcheck launchprogresscheck gamedrivecheck fontlinkcheck launchercheck \
+	buildcheck settingscheck routecheck bridgecheck standalonecheck envpasscheck prefixnotecheck powernotecheck exitcheck anticheatcheck launchprogresscheck gamedrivecheck fontlinkcheck launchercheck \
 	seedcheck gamefixescheck versioncheck ledgercheck stablecheck betacheck cicheck padcheck mappingscheck detourcheck compat-reported-check np-inventory-check np-native-tests native-shim-tests \
 	app-tests native-installercheck
 
