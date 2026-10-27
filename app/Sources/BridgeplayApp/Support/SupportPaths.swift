@@ -63,6 +63,9 @@ enum SupportPaths {
     static var gamefixes: URL { support.appending(path: "gamefixes") }
     // Where Remove Everything moves the user's own overrides, outside the folder it deletes.
     static var keptGamefixes: URL { applicationSupport.appending(path: "\(supportDirName)-gamefixes") }
+    // Games Bridgeplay starts without Steam. They are installed inside their prefixes, so the
+    // folder is outside the one Remove Everything deletes.
+    static var games: URL { applicationSupport.appending(path: "\(supportDirName)-games") }
 
     static var signatures: URL {
         support.appending(path: "signatures/macos.arm64")

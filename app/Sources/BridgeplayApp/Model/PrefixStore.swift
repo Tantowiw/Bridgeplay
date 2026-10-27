@@ -7,10 +7,15 @@ struct SteamLibrary: Sendable, Hashable {
 
     var volume: String?
 
+    // GameStore's folder of games Bridgeplay starts without Steam. Each game folder is laid out
+    // like a compatdata entry, so the folder itself stands in for compatdata.
+    var isBridgeplay = false
+
     var steamapps: URL { root.appending(path: "steamapps") }
-    var compatdata: URL { steamapps.appending(path: "compatdata") }
+    var compatdata: URL { isBridgeplay ? root : steamapps.appending(path: "compatdata") }
 
     var displayName: String {
+        if isBridgeplay { return "Bridgeplay" }
         guard let volume else { return root.lastPathComponent }
         return volume
     }
@@ -123,8 +128,10 @@ enum PrefixStore {
                     isDirectory.boolValue
                 else { continue }
 
-                var name = appName(appID: appID, in: library)
-                if name == nil, let id = UInt32(appID), id & 0x8000_0000 != 0 {
+                if library.isBridgeplay, !GameStore.isGameID(appID) { continue }
+                var name = library.isBridgeplay
+                    ? GameStore.game(id: appID, in: library.root)?.name : appName(appID: appID, in: library)
+                if name == nil, !library.isBridgeplay, let id = UInt32(appID), id & 0x8000_0000 != 0 {
                     if shortcuts == nil { shortcuts = shortcutNames(userdata: userdata) }
                     name = shortcuts?[appID]
                 }

@@ -305,6 +305,22 @@
         }
       }
     },
+    "%@ has no run script at %@. Set up the compatibility tool again." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ non ha uno script di avvio in %2$@. Configura di nuovo lo strumento di compatibilità."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ 在 %2$@ 没有启动脚本。请重新设置兼容性工具。"
+          }
+        }
+      }
+    },
     "%@ is already listed." : {
       "localizations" : {
         "it" : {
@@ -365,6 +381,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ 已在 Steam 中设置。修复 Steam 即可将其移除，设置会自动继续。"
+          }
+        }
+      }
+    },
+    "%@ is installed inside this prefix, so deleting or rebuilding the prefix would remove the game." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ è installato in questo prefisso, quindi eliminare o ricreare il prefisso rimuoverebbe il gioco."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 安装在这个游戏容器中，删除或重建游戏容器会移除这个游戏。"
           }
         }
       }
@@ -1336,6 +1368,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "从其他文件夹添加 CrossOver 应用。"
+          }
+        }
+      }
+    },
+    "Add game" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi gioco"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加游戏"
           }
         }
       }
@@ -3131,6 +3179,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "选择所选游戏运行时使用的图形、帧生成和其他设置。"
+          }
+        }
+      }
+    },
+    "Choose the program that starts %@ first." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli prima il programma che avvia %@."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请先选择启动 %@ 的程序。"
           }
         }
       }
@@ -5234,6 +5298,22 @@
         }
       }
     },
+    "Give the game a name." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dai un nome al gioco."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请为游戏命名。"
+          }
+        }
+      }
+    },
     "Good to know" : {
       "localizations" : {
         "it" : {
@@ -6642,6 +6722,22 @@
         }
       }
     },
+    "No free game ID was found in %@." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessun ID di gioco libero trovato in %@."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 %@ 中找不到可用的游戏 ID。"
+          }
+        }
+      }
+    },
     "No longer installed" : {
       "localizations" : {
         "it" : {
@@ -7310,6 +7406,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "性能"
+          }
+        }
+      }
+    },
+    "Play %@" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gioca a %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始玩 %@"
           }
         }
       }
@@ -8782,6 +8894,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "基于 CodeWeavers 的 Wine 和 Apple 的 Game Porting Toolkit 运行。"
+          }
+        }
+      }
+    },
+    "Save %@" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salva %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存 %@"
           }
         }
       }

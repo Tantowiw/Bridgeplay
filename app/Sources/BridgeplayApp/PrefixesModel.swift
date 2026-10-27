@@ -68,7 +68,7 @@ final class PrefixesModel {
     private let makeBackup: @Sendable (WinePrefix) throws -> URL
 
     init(
-        libraries: @escaping @Sendable () -> [SteamLibrary] = { PrefixStore.libraries() },
+        libraries: @escaping @Sendable () -> [SteamLibrary] = { PrefixStore.libraries() + [GameStore.library] },
         installedTools: @escaping @Sendable () -> [InstalledTool] = { CompatToolList.installed() },
         rebuild: @escaping @Sendable (WinePrefix, InstalledTool, Bool) throws -> URL? = {
             try PrefixTools.recreate($0, as: $1, keepBackup: $2)

@@ -432,7 +432,18 @@ enum PrefixTools {
         }
     }
 
+    // A Bridgeplay game is installed inside its prefix, so a prefix that Steam would simply
+    // make again on the next launch is the game itself here.
+    static func refuseIfGame(_ prefix: WinePrefix, step: String) throws {
+        guard prefix.library.isBridgeplay else { return }
+        throw StepFailure(
+            step: step,
+            detail: String(localized: "\(prefix.title) is installed inside this prefix, so deleting or rebuilding the prefix would remove the game.")
+        )
+    }
+
     static func delete(_ prefix: WinePrefix) throws {
+        try refuseIfGame(prefix, step: String(localized: "Delete prefix"))
         guard let claim = PrefixStore.claim(prefix) else {
             throw StepFailure(
                 step: String(localized: "Delete prefix"),
