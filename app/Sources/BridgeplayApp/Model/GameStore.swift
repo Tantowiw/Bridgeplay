@@ -12,6 +12,8 @@ struct StandaloneGame: Sendable, Hashable, Identifiable {
     // can move with the game in it.
     var executable: String?
     var arguments: [String] = []
+    // The compatibility tool Play runs the game with, by name.
+    var tool: String?
 }
 
 enum GameStore {
@@ -43,6 +45,7 @@ enum GameStore {
         var name: String
         var executable: String?
         var arguments: [String]?
+        var tool: String?
     }
 
     static func game(id: String, in root: URL = SupportPaths.games) -> StandaloneGame? {
@@ -51,7 +54,8 @@ enum GameStore {
               let record = try? JSONDecoder().decode(Record.self, from: data)
         else { return nil }
         return StandaloneGame(
-            id: id, name: record.name, executable: record.executable, arguments: record.arguments ?? [])
+            id: id, name: record.name, executable: record.executable, arguments: record.arguments ?? [],
+            tool: record.tool)
     }
 
     static func all(in root: URL = SupportPaths.games) -> [StandaloneGame] {
@@ -67,8 +71,9 @@ enum GameStore {
     }
 
     // The next ID is one past the highest folder, including one a failed add left without a
-    // record, so an ID is never handed out twice. Making the folder is what claims it.
-    static func add(name: String, in root: URL = SupportPaths.games) throws -> StandaloneGame {
+    // record. Making the folder is what claims it. Removing the newest game frees its ID
+    // again, which is why remove also takes what Bridgeplay keeps elsewhere under that ID.
+    static func add(name: String, tool: String? = nil, in root: URL = SupportPaths.games) throws -> StandaloneGame {
         let step = String(localized: "Add game")
         let name = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !name.isEmpty else { throw StepFailure(step: step, detail: String(localized: "Give the game a name.")) }
@@ -82,7 +87,7 @@ enum GameStore {
                 next += 1
                 continue
             }
-            let game = StandaloneGame(id: id, name: name)
+            let game = StandaloneGame(id: id, name: name, tool: tool)
             try save(game, in: root)
             AppLog.note("games: added \(id)")
             return game
@@ -92,12 +97,35 @@ enum GameStore {
 
     static func save(_ game: StandaloneGame, in root: URL = SupportPaths.games) throws {
         let record = Record(
-            name: game.name, executable: game.executable, arguments: game.arguments.isEmpty ? nil : game.arguments)
+            name: game.name, executable: game.executable, arguments: game.arguments.isEmpty ? nil : game.arguments,
+            tool: game.tool)
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
         try atomicReplace(
             folder(of: game.id, in: root).appending(path: recordName), with: encoder.encode(record),
             step: String(localized: "Save \(game.name)"))
+    }
+
+    // The game's folder, with the game installed in its prefix and its saves, then its launcher
+    // bundle and Game Settings, which a later game given the same ID must not inherit.
+    static func remove(
+        _ game: StandaloneGame, in root: URL = SupportPaths.games,
+        launchers: URL = SupportPaths.launchers, gamefixes: URL = SupportPaths.gamefixes
+    ) throws {
+        let prefix = prefix(of: game, in: root)
+        guard let claim = PrefixStore.claim(prefix) else {
+            throw StepFailure(
+                step: String(localized: "Remove \(game.name)"),
+                detail: String(localized: "\(prefix.title) is running. Quit the game first.")
+            )
+        }
+        defer { claim.release() }
+        let folder = folder(of: game.id, in: root)
+        try WriteRefused.catching(folder) { try FileManager.default.removeItem(at: folder) }
+        for leftover in [launchers.appending(path: game.id), gamefixes.appending(path: "\(game.id).conf")] {
+            try? FileManager.default.removeItem(at: leftover)
+        }
+        AppLog.note("games: removed \(game.id)")
     }
 
     // nil when the path is absolute or climbs out of the game's folder.
@@ -159,8 +187,14 @@ enum GameStore {
             environment: env, directory: executable.deletingLastPathComponent())
     }
 
+    // The game's own tool while it is installed, otherwise the one the prefix was last run by.
+    static func tool(for game: StandaloneGame, among tools: [InstalledTool] = CompatToolList.installed()) throws -> InstalledTool {
+        if let named = tools.first(where: { $0.name == game.tool }) { return named }
+        return try PrefixTools.resolvedTool(step: String(localized: "Play \(game.name)"), for: prefix(of: game), among: tools)
+    }
+
     static func play(_ game: StandaloneGame, program: URL? = nil) throws {
-        let tool = try PrefixTools.resolvedTool(step: String(localized: "Play \(game.name)"), for: prefix(of: game))
+        let tool = try tool(for: game)
         let launch = try launch(game, program: program, tool: tool)
         AppLog.note("games: play \(game.id) with \(tool.name)\(program == nil ? "" : ", running another program")")
         try Shell.detach(

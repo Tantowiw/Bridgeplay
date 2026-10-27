@@ -160,3 +160,110 @@ struct GameStoreTests {
         #expect(GameStore.game(id: game.id, in: root) == game)
     }
 }
+
+@Suite("Game store: removing and tools")
+struct GameStoreRemoveTests {
+    @Test("Removing a game takes its folder and what Bridgeplay keeps under its ID, and nothing else")
+    func removesTheGame() throws {
+        let work = try scratchDirectory("games")
+        defer { try? FileManager.default.removeItem(at: work) }
+        let root = work.appending(path: "games")
+        let launchers = work.appending(path: "launchers")
+        let gamefixes = work.appending(path: "gamefixes")
+        let game = try GameStore.add(name: "Gone", in: root)
+        let kept = try GameStore.add(name: "Kept", in: root)
+        for id in [game.id, kept.id] {
+            try FileManager.default.createDirectory(at: launchers.appending(path: id), withIntermediateDirectories: true)
+            try FileManager.default.createDirectory(at: gamefixes, withIntermediateDirectories: true)
+            try Data("BACKEND=dxmt\n".utf8).write(to: gamefixes.appending(path: "\(id).conf"))
+        }
+
+        try GameStore.remove(game, in: root, launchers: launchers, gamefixes: gamefixes)
+        #expect(GameStore.all(in: root).map(\.id) == [kept.id])
+        #expect(!FileManager.default.fileExists(atPath: launchers.appending(path: game.id).path))
+        #expect(!FileManager.default.fileExists(atPath: gamefixes.appending(path: "\(game.id).conf").path))
+        #expect(FileManager.default.fileExists(atPath: launchers.appending(path: kept.id).path))
+        #expect(FileManager.default.fileExists(atPath: gamefixes.appending(path: "\(kept.id).conf").path))
+    }
+
+    @Test("Play uses the game's own tool while it is installed")
+    func picksTheGamesTool() throws {
+        let root = try scratchDirectory("games")
+        defer { try? FileManager.default.removeItem(at: root) }
+        let first = InstalledTool(tool: CompatTool(name: "first", flavor: .rosetta, display: "First"), build: "a")
+        let chosen = InstalledTool(tool: CompatTool(name: "chosen", flavor: .rosetta, display: "Chosen"), build: "b")
+        var game = try GameStore.add(name: "Game", tool: "chosen", in: root)
+        #expect(GameStore.game(id: game.id, in: root)?.tool == "chosen")
+        #expect(try GameStore.tool(for: game, among: [first, chosen]) == chosen)
+        game.tool = "uninstalled"
+        #expect(try GameStore.tool(for: game, among: [first, chosen]) == first)
+    }
+}
+
+@MainActor
+@Suite("Games page")
+struct GamesModelTests {
+    final class Started: @unchecked Sendable {
+        var calls: [(String, URL?)] = []
+    }
+
+    @Test("A program is kept only from inside the game's prefix, and Play starts the game")
+    func choosesTheProgramAndPlays() async throws {
+        let root = try scratchDirectory("games")
+        defer { try? FileManager.default.removeItem(at: root) }
+        let started = Started()
+        let model = GamesModel(root: root, installedTools: { [] }, start: { started.calls.append(($0.id, $1)) })
+
+        let game = try #require(await model.add(name: "Game", tool: nil))
+        #expect(model.games.map(\.id) == [game.id])
+        #expect(model.selection == game.id)
+        #expect(!model.hasPrefix(game))
+
+        let inside = GameStore.folder(of: game.id, in: root).appending(path: "pfx/drive_c/Game/Launcher.exe")
+        try FileManager.default.createDirectory(at: inside.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try Data().write(to: inside)
+
+        await model.setProgram(root.appending(path: "Elsewhere.exe"), for: game)
+        #expect(model.report != nil)
+        #expect(model.program(model.games[0]) == nil)
+
+        await model.setProgram(inside, for: game)
+        #expect(model.report == nil)
+        let saved = model.games[0]
+        #expect(saved.executable == "pfx/drive_c/Game/Launcher.exe")
+        #expect(model.program(saved) == "Launcher.exe")
+
+        model.play(saved)
+        #expect(started.calls.count == 1)
+        #expect(started.calls.first?.0 == game.id)
+        #expect(started.calls.first?.1 == nil)
+    }
+
+    @Test("Removing asks first, and a refusal is reported")
+    func removesAfterConfirming() async throws {
+        let root = try scratchDirectory("games")
+        defer { try? FileManager.default.removeItem(at: root) }
+        let model = GamesModel(
+            root: root, installedTools: { [] }, start: { _, _ in },
+            remove: { game in
+                if game.name == "Busy" { throw StepFailure(step: "Remove", detail: "running") }
+                try FileManager.default.removeItem(at: GameStore.folder(of: game.id, in: root))
+            })
+        let busy = try #require(await model.add(name: "Busy", tool: nil))
+        let gone = try #require(await model.add(name: "Gone", tool: nil))
+
+        await model.confirmRemove()
+        #expect(model.games.count == 2)
+
+        model.removing = busy
+        await model.confirmRemove()
+        #expect(model.report != nil)
+        #expect(model.games.count == 2)
+
+        model.removing = gone
+        await model.confirmRemove()
+        #expect(model.report == nil)
+        #expect(model.games.map(\.id) == [busy.id])
+        #expect(model.removing == nil)
+    }
+}

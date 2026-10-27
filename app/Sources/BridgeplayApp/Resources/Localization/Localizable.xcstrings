@@ -441,6 +441,22 @@
         }
       }
     },
+    "%@ has no prefix yet. Run its installer first." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ non ha ancora un prefisso. Esegui prima il suo programma di installazione."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 还没有游戏容器。请先运行它的安装程序。"
+          }
+        }
+      }
+    },
     "%@ has no run script at %@. Set up the compatibility tool again." : {
       "localizations" : {
         "it" : {
@@ -452,7 +468,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ 在 %2$@ 没有启动脚本。请重新设置兼容性工具。"
+            "value" : "%1$@ 在 %2$@ 没有启动脚本。请重新设置兼容工具。"
           }
         }
       }
@@ -689,6 +705,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ 不是有效的 CrossOver 应用。"
+          }
+        }
+      }
+    },
+    "%@ is not inside the prefix of %@. Choose a program its installer put there." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ non si trova nel prefisso di %2$@. Scegli un programma che il suo programma di installazione ha messo lì."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ 不在“%2$@”的游戏容器中。请选择其安装程序放在那里的程序。"
           }
         }
       }
@@ -1996,6 +2028,38 @@
         }
       }
     },
+    "Add a Windows game that is not from Steam." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi un gioco Windows che non viene da Steam."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加一个不是来自 Steam 的 Windows 游戏。"
+          }
+        }
+      }
+    },
+    "Add a Windows game that is not from Steam. Bridgeplay gives it its own prefix and starts it without Steam." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi un gioco Windows che non viene da Steam. Bridgeplay gli dà un prefisso tutto suo e lo avvia senza Steam."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加一个不是来自 Steam 的 Windows 游戏。Bridgeplay 会为它创建独立的游戏容器，并在不使用 Steam 的情况下启动它。"
+          }
+        }
+      }
+    },
     "Add a copy of CrossOver from another folder." : {
       "localizations" : {
         "it" : {
@@ -2014,6 +2078,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "从其他文件夹添加 CrossOver 应用。"
+          }
+        }
+      }
+    },
+    "Add and Choose Installer…" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi e scegli il programma di installazione…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加并选择安装程序…"
           }
         }
       }
@@ -2096,6 +2176,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "添加到"
+          }
+        }
+      }
+    },
+    "Added %@. Run its installer to install it in its own prefix." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiunto %@. Esegui il suo programma di installazione per installarlo nel suo prefisso."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已添加 %@。运行它的安装程序，把它安装到它自己的游戏容器中。"
           }
         }
       }
@@ -4853,6 +4949,38 @@
         }
       }
     },
+    "Choose Program" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli il programma"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择程序"
+          }
+        }
+      }
+    },
+    "Choose Program…" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli il programma…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择程序…"
+          }
+        }
+      }
+    },
     "Choose a Windows program to run in %@." : {
       "localizations" : {
         "it" : {
@@ -4891,6 +5019,38 @@
         }
       }
     },
+    "Choose the installer for %@. It runs in the game's own prefix." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli il programma di installazione di %@. Viene eseguito nel prefisso del gioco."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择 %@ 的安装程序。它会在这个游戏自己的游戏容器中运行。"
+          }
+        }
+      }
+    },
+    "Choose the program Play starts, such as the game's launcher." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli il programma che Gioca avvia, ad esempio il launcher del gioco."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择“开始游戏”要启动的程序，例如游戏的启动器。"
+          }
+        }
+      }
+    },
     "Choose the program that starts %@ first." : {
       "localizations" : {
         "it" : {
@@ -4903,6 +5063,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "请先选择启动 %@ 的程序。"
+          }
+        }
+      }
+    },
+    "Choose the program that starts %@." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli il programma che avvia %@."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择启动 %@ 的程序。"
           }
         }
       }
@@ -7922,6 +8098,22 @@
         }
       }
     },
+    "Games" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Giochi"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "游戏"
+          }
+        }
+      }
+    },
     "Games that offer Vulkan as a rendering option run it through MoltenVK, without DLSS. Prefer DirectX 11 or 12." : {
       "localizations" : {
         "it" : {
@@ -8462,6 +8654,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "游戏画面如何放大到屏幕。自动保持现在的效果：关闭高分辨率时 Wine 会将每个像素锐利地放大一倍，Mac 游戏则会被平滑。线性会平滑，最近邻让每个像素保持锐利，适合像素风格，整数仅在正好 2 倍或 3 倍时锐利。若开启 MetalFX 超分辨率，它会先执行。"
+          }
+        }
+      }
+    },
+    "ID" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID"
           }
         }
       }
@@ -9676,6 +9884,22 @@
         }
       }
     },
+    "List the games again." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elenca di nuovo i giochi."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新列出游戏。"
+          }
+        }
+      }
+    },
     "List the prefixes again and update their sizes." : {
       "localizations" : {
         "it" : {
@@ -9738,6 +9962,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在查找备份"
+          }
+        }
+      }
+    },
+    "Looking for games" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ricerca dei giochi"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在查找游戏"
           }
         }
       }
@@ -10094,6 +10334,38 @@
         }
       }
     },
+    "Name" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nome"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名称"
+          }
+        }
+      }
+    },
+    "Name the game, then choose its installer. Bridgeplay runs the installer in the game's own prefix, without Steam." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dai un nome al gioco, poi scegli il suo programma di installazione. Bridgeplay lo esegue nel prefisso del gioco, senza Steam."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "为游戏命名，然后选择它的安装程序。Bridgeplay 会在这个游戏自己的游戏容器中运行安装程序，不使用 Steam。"
+          }
+        }
+      }
+    },
     "Native Mac games" : {
       "localizations" : {
         "it" : {
@@ -10204,6 +10476,38 @@
         }
       }
     },
+    "New Game" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuovo gioco"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新游戏"
+          }
+        }
+      }
+    },
+    "New Game…" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuovo gioco…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新游戏…"
+          }
+        }
+      }
+    },
     "No Backups" : {
       "localizations" : {
         "it" : {
@@ -10222,6 +10526,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "暂无备份"
+          }
+        }
+      }
+    },
+    "No Games" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessun gioco"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "没有游戏"
           }
         }
       }
@@ -10502,6 +10822,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "暂不"
+          }
+        }
+      }
+    },
+    "Not chosen" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non scelto"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未选择"
+          }
+        }
+      }
+    },
+    "Not installed" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non installato"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未安装"
           }
         }
       }
@@ -11342,6 +11694,22 @@
         }
       }
     },
+    "Play" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gioca"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始游戏"
+          }
+        }
+      }
+    },
     "Play %@" : {
       "localizations" : {
         "it" : {
@@ -11354,6 +11722,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "开始玩 %@"
+          }
+        }
+      }
+    },
+    "Play now starts %@." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ora Gioca avvia %@."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“开始游戏”现在会启动 %@。"
           }
         }
       }
@@ -11508,6 +11892,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "独占空间"
+          }
+        }
+      }
+    },
+    "Program" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Programma"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "程序"
           }
         }
       }
@@ -12304,6 +12704,38 @@
         }
       }
     },
+    "Remove %@" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rimuovi %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移除 %@"
+          }
+        }
+      }
+    },
+    "Remove %@?" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rimuovere %@?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移除 %@？"
+          }
+        }
+      }
+    },
     "Remove Bridgeplay" : {
       "localizations" : {
         "it" : {
@@ -12414,6 +12846,38 @@
         }
       }
     },
+    "Remove Game" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rimuovi gioco"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移除游戏"
+          }
+        }
+      }
+    },
+    "Remove Game…" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rimuovi gioco…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移除游戏…"
+          }
+        }
+      }
+    },
     "Remove build" : {
       "localizations" : {
         "it" : {
@@ -12520,6 +12984,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "移除 %@ 的副本？"
+          }
+        }
+      }
+    },
+    "Removed %@." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ rimosso."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已移除 %@。"
           }
         }
       }
@@ -13294,6 +13774,22 @@
         }
       }
     },
+    "Run Installer…" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esegui programma di installazione…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "运行安装程序…"
+          }
+        }
+      }
+    },
     "Run Program…" : {
       "localizations" : {
         "it" : {
@@ -13356,6 +13852,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "在所选游戏容器中运行程序或打开 Wine 工具。"
+          }
+        }
+      }
+    },
+    "Run the selected game's installer in its own prefix." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esegui il programma di installazione del gioco selezionato nel suo prefisso."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在所选游戏自己的游戏容器中运行它的安装程序。"
           }
         }
       }
@@ -14486,6 +14998,22 @@
         }
       }
     },
+    "Start the selected game." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avvia il gioco selezionato."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "启动所选游戏。"
+          }
+        }
+      }
+    },
     "Started %@ in %@." : {
       "localizations" : {
         "it" : {
@@ -14504,6 +15032,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已在“%2$@”中启动 %1$@。"
+          }
+        }
+      }
+    },
+    "Started %@ in %@. When it has finished, choose the program that starts the game." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avviato %1$@ in %2$@. Al termine, scegli il programma che avvia il gioco."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已在“%2$@”中启动 %1$@。完成后，请选择启动这个游戏的程序。"
+          }
+        }
+      }
+    },
+    "Started %@." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ avviato."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已启动 %@。"
           }
         }
       }
@@ -16905,6 +17465,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "这份 Bridgeplay 比 Steam 中的版本旧。请打开较新的 App。"
+          }
+        }
+      }
+    },
+    "This deletes the game's folder, with the game installed in its prefix and any saves kept there. Back up the prefix in Prefixes first to keep them." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo elimina la cartella del gioco, con il gioco installato nel suo prefisso e i salvataggi lì conservati. Per tenerli, esegui prima il backup del prefisso in Prefissi."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这会删除游戏的文件夹，包括安装在其游戏容器中的游戏和保存在那里的存档。如需保留，请先在“游戏容器”中备份它。"
           }
         }
       }
