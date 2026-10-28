@@ -76,6 +76,11 @@ struct WinecxRelease: Sendable {
     // games that turn features off under Wine (hide-wine-exports-patch/,
     // NOTPROTON_HIDE_WINE_EXPORTS). Empty where the runtime's own are kept.
     let loader: [WinecxBundledFile]
+    // wbemprox rebuilt so Win32_ComputerSystem reports AutomaticManagedPagefile TRUE, as
+    // Windows does by default; Digimon Story Time Stranger otherwise wants 8 GiB of free
+    // commit, which a Mac without swap in use can't show (wbemprox-patch/). Empty where the
+    // runtime's own is kept.
+    let wmi: [WinecxBundledFile]
     // The runner build this release unpacks to, keyed by its pinned loader, and the ntdll
     // detours for it (NtdllPatcher.byBuild).
     let runner: RunnerBuild
@@ -228,6 +233,12 @@ enum FreeEngineWinecx {
                               path: "lib/wine/x86_64-windows/kernelbase.dll",
                               sha256: "4d55600b204724046567688ca96132e49e53af1baac7a362f3e2bf285f669a8a"),
         ],
+        // wbemprox.dll: winecx e0aa380's PE half with wbemprox-patch/winecx-automatic-pagefile.patch.
+        wmi: [
+            WinecxBundledFile(resource: "wbemprox-winecx-11.17", ext: "dll",
+                              path: "lib/wine/x86_64-windows/wbemprox.dll",
+                              sha256: "6c9ea72cd84c1aa8078782473297a9dcff3c34bd9021d9ded3d08123526f0207"),
+        ],
         runner: RunnerBuild(
             bundleVersion: "winecx-11.17",
             releaseVersion: "WineCX 11.17",
@@ -319,6 +330,7 @@ enum FreeEngineWinecx {
         audio: [],
         d3dx: [],
         loader: [],
+        wmi: [],
         // The hash-pinned loader is what makes it free, so a CrossOver install can never be
         // taken for it.
         runner: RunnerBuild(
@@ -411,7 +423,7 @@ enum FreeEngineWinecx {
     // checks them, since they are either Wine's own or links into a Game Porting Toolkit.
     static func expectedFiles(_ release: WinecxRelease = current) -> [String: String] {
         var table: [String: String] = [FreeEngine.macDriverPath: release.macDriver]
-        for file in release.gamepad + release.network + release.nvidia + release.audio + release.d3dx + release.loader { table[file.path] = file.sha256 }
+        for file in release.gamepad + release.network + release.nvidia + release.audio + release.d3dx + release.loader + release.wmi { table[file.path] = file.sha256 }
         for file in release.backends { table["\(backendsPath)/\(file.destination)"] = file.sha256 }
         for path in release.renderer.files.keys {
             table[release.renderer.installPath(of: path)] = release.renderer.installedHash(of: path)
@@ -500,7 +512,7 @@ enum FreeEngineWinecx {
         try fm.createDirectory(at: root.deletingLastPathComponent(), withIntermediateDirectories: true)
         try fm.moveItem(at: wine, to: root)
         try FreeEngine.installMacDriver(root: root, build: release.build, sha256: release.macDriver, step: step)
-        try installBundled(release.gamepad + release.network + release.nvidia + release.audio + release.d3dx + release.loader, root: root)
+        try installBundled(release.gamepad + release.network + release.nvidia + release.audio + release.d3dx + release.loader + release.wmi, root: root)
 
         let libraries = wine.deletingLastPathComponent()
         for file in release.backends {

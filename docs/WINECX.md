@@ -102,6 +102,7 @@ lib/wine/x86_64-windows/winebus.sys               11.17 only: map-key fix, repla
 lib/wine/x86_64-windows/ws2_32.dll                11.17 only: own host name without loopback, replacing the archive's (Own host name)
 lib/wine/x86_64-windows/kernel{32,base}.dll       11.17 only: GetProcAddress can hide ntdll's wine_* exports, replacing the archive's (Hidden Wine exports)
 lib/wine/{x86_64,i386}-windows/d3dx11_4{2,3}.dll  11.17 only: D3DX11CreateThreadPump stub, replacing the archive's (D3DX11 thread pump)
+lib/wine/x86_64-windows/wbemprox.dll              11.17 only: AutomaticManagedPagefile TRUE, replacing the archive's (Managed page file)
 lib/libSDL2-2.0.0.dylib                           SDL 2.32.10, x86_64, for winebus.so (Controllers)
 ```
 
@@ -244,6 +245,28 @@ too, `make dlls/d3dx11_4{3,2}/{x86_64,i386}-windows/d3dx11_4{3,2}.dll`, then
 `{x86_64,i686}-w64-mingw32-strip --strip-debug`. Built without the patch, every section of
 all four is byte-identical to the runtime's; only the build id differs and the runtime's
 `.eh_frame` name is cut to `.eh_fram`. 11.15 keeps the runtime's own.
+
+## Managed page file
+
+Digimon Story Time Stranger refuses to start with "Insufficient memory or disk space" unless
+`Win32_ComputerSystem.AutomaticManagedPagefile` is TRUE, `Win32_PageFileSetting` lists page
+files, or `GlobalMemoryStatusEx` shows at least 8 GiB of `ullAvailPageFile`. Wine's
+`Win32_ComputerSystem` has no such property and no `Win32_PageFileSetting` rows, and on macOS
+the commit limit is RAM plus swap in use, so a 16 GB Mac with no swap in use showed about
+5 GiB. The same message is what CrossOver and Whisky users get. Wine master has no such
+property (checked 2026-10-28).
+
+11.17 ships `wbemprox-winecx-11.17.dll` as `lib/wine/x86_64-windows/wbemprox.dll`: winecx
+`e0aa380`'s PE half with `wbemprox-patch/winecx-automatic-pagefile.patch`, which adds
+`AutomaticManagedPagefile` (`VARIANT_TRUE`, Windows' default) to `Win32_ComputerSystem`. The
+pin is the release's `wmi`.
+
+Built like `ws2_32` (Own host name): the tree configured as in `winemac-patch/README.md` with
+the source checked out as `winecx/` beside the build directory (wbemprox's assertions carry
+`../winecx/dlls/...` paths), brew's bison on `PATH` for `make` too,
+`make dlls/wbemprox/x86_64-windows/wbemprox.dll`, then `x86_64-w64-mingw32-strip
+--strip-debug`. Built without the patch, it is byte-identical to the runtime's `wbemprox.dll`
+except the PE timestamp, checksum and build id. 11.15 keeps the runtime's own.
 
 ## D3DMetal: the builtin model
 
@@ -433,6 +456,7 @@ rebuilt Mach-O file needs its line there updated too; `SignedPinTests` fails unt
 | `ws2_32-winecx-11.17.dll` | `ws2_32-patch/` | `cb0a5670ce6dbf949ed25cca54e9f1c4930cd4c2ade895836d518d3d9073079c` | `FreeEngineWinecx.v1117.network` |
 | `kernel32-winecx-11.17.dll` | `hide-wine-exports-patch/` | `9cffe153abd3f91f7157f936377baac47c5aef9fa807e263a0f9e051c6010af3` | `FreeEngineWinecx.v1117.loader` |
 | `kernelbase-winecx-11.17.dll` | `hide-wine-exports-patch/` | `4d55600b204724046567688ca96132e49e53af1baac7a362f3e2bf285f669a8a` | `FreeEngineWinecx.v1117.loader` |
+| `wbemprox-winecx-11.17.dll` | `wbemprox-patch/` | `6c9ea72cd84c1aa8078782473297a9dcff3c34bd9021d9ded3d08123526f0207` | `FreeEngineWinecx.v1117.wmi` |
 | `d3dx11_43-winecx-11.17.dll` | `d3dx11-patch/` | `7d23cdfacc922f67dfa2eba98df277ae2ae351ad3646c3191a84966b55dbbfd3` | `FreeEngineWinecx.v1117.d3dx` |
 | `d3dx11_43-winecx-11.17-i386.dll` | `d3dx11-patch/` | `dd4dd351f2a5880c9848d5ccf4944a0b5e7622bb7fb196544115b1f9c92d749c` | `FreeEngineWinecx.v1117.d3dx` |
 | `d3dx11_42-winecx-11.17.dll` | `d3dx11-patch/` | `3d97e1de9000a78e27eb5c90d0ab9b36d54fd350760063da27226d22c90c8e1b` | `FreeEngineWinecx.v1117.d3dx` |

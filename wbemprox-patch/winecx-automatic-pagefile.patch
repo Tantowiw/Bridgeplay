@@ -1,0 +1,29 @@
+diff --git a/dlls/wbemprox/builtin.c b/dlls/wbemprox/builtin.c
+index 0693460..3eeeb99 100644
+--- a/dlls/wbemprox/builtin.c
++++ b/dlls/wbemprox/builtin.c
+@@ -105,6 +105,7 @@ static const struct column col_cdromdrive[] =
+ };
+ static const struct column col_compsys[] =
+ {
++    { L"AutomaticManagedPagefile",  CIM_BOOLEAN },
+     { L"Description",               CIM_STRING },
+     { L"Domain",                    CIM_STRING },
+     { L"DomainRole",                CIM_UINT16 },
+@@ -693,6 +694,7 @@ struct record_cdromdrive
+ };
+ struct record_computersystem
+ {
++    int          automaticmanagedpagefile;
+     const WCHAR *description;
+     const WCHAR *domain;
+     UINT16       domainrole;
+@@ -2027,6 +2029,8 @@ static enum fill_status fill_compsys( struct table *table, const struct expr *co
+     GetSystemFirmwareTable( RSMB, 0, buf, len );
+ 
+     rec = (struct record_computersystem *)table->data;
++    /* Windows' default; macOS grows its swap on demand, as a system-managed page file does */
++    rec->automaticmanagedpagefile = -1;
+     rec->description            = L"AT/AT COMPATIBLE";
+     rec->domain                 = L"WORKGROUP";
+     rec->manufacturer           = get_compsysproduct_vendor( buf, len );

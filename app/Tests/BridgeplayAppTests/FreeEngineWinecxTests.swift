@@ -277,6 +277,21 @@ struct FreeEngineWinecxTests {
         }
     }
 
+    // wbemprox-patch: 11.17 ships a wbemprox reporting AutomaticManagedPagefile TRUE.
+    @Test("The patched wbemprox ships with the app and is pinned for 11.17",
+          arguments: FreeEngineWinecx.releases.map(\.build))
+    func wmi(id: String) throws {
+        let release = try #require(FreeEngineWinecx.release(build: id))
+        let expected: Set<String> = release.build == "winecx-11.17" ? ["lib/wine/x86_64-windows/wbemprox.dll"] : []
+        #expect(Set(release.wmi.map(\.path)) == expected)
+        let table = FreeEngineWinecx.expectedFiles(release)
+        for file in release.wmi {
+            let bundled = try #require(Bundle.module.url(forResource: file.resource, withExtension: file.ext))
+            #expect(Digest.sha256IfPresent(bundled) == file.sha256, "\(file.resource)")
+            #expect(table[file.path] == file.sha256, "\(file.path)")
+        }
+    }
+
     @Test("Each free engine is current, outdated or missing on its own pins")
     func perEngineState() throws {
         let winehqBuild = try #require(SupportedRunners.build(id: FreeEngine.current.build))
