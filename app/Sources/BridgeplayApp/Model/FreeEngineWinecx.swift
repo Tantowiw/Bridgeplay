@@ -89,13 +89,18 @@ struct WinecxRelease: Sendable {
     // dxmt backend on a D3DMetal engine, so games that try D3D12 first fall back to D3D11
     // instead of crashing in Apple's d3d12 (#2513). Empty where it is not shipped.
     let dxmt: [WinecxBundledFile]
+    // wbemprox rebuilt so Win32_ComputerSystem reports AutomaticManagedPagefile TRUE, as
+    // Windows does by default; Digimon Story Time Stranger otherwise wants 8 GiB of free
+    // commit, which a Mac without swap in use can't show (wbemprox-patch/). Empty where the
+    // runtime's own is kept.
+    let wmi: [WinecxBundledFile]
     // The runner build this release unpacks to, keyed by its pinned loader, and the ntdll
     // detours for it (NtdllPatcher.byBuild).
     let runner: RunnerBuild
     let ntdllPatches: [NtdllPatch]
 
     // The app's own files, every category above.
-    var bundled: [WinecxBundledFile] { gamepad + network + nvidia + audio + d3dx + loader + rockstar + dxmt }
+    var bundled: [WinecxBundledFile] { gamepad + network + nvidia + audio + d3dx + loader + rockstar + dxmt + wmi }
 }
 
 enum FreeEngineWinecx {
@@ -286,6 +291,12 @@ enum FreeEngineWinecx {
                               path: "lib/notproton-backends/d3d12-stub/x86_64-windows/d3d12.dll",
                               sha256: "d802d04ae9fb18a3dda90984bb11def0bda89b4d929b6297fe026b6cf883d1db"),
         ],
+        // wbemprox.dll: winecx e0aa380's PE half with wbemprox-patch/winecx-automatic-pagefile.patch.
+        wmi: [
+            WinecxBundledFile(resource: "wbemprox-winecx-11.17", ext: "dll",
+                              path: "lib/wine/x86_64-windows/wbemprox.dll",
+                              sha256: "6c9ea72cd84c1aa8078782473297a9dcff3c34bd9021d9ded3d08123526f0207"),
+        ],
         runner: RunnerBuild(
             bundleVersion: "winecx-11.17",
             releaseVersion: "WineCX 11.17",
@@ -379,6 +390,7 @@ enum FreeEngineWinecx {
         loader: [],
         rockstar: [],
         dxmt: [],
+        wmi: [],
         // The hash-pinned loader is what makes it free, so a CrossOver install can never be
         // taken for it.
         runner: RunnerBuild(
