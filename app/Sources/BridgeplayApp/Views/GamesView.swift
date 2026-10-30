@@ -78,6 +78,20 @@ struct GamesView: View {
         } message: { _ in
             Text("This deletes the game's prefix, with anything installed or saved in it. A game folder outside the prefix, such as one in Downloads, is kept. Back up the prefix in Prefixes first to keep it.")
         }
+        .confirmationDialog(
+            String(localized: "Force quit \(model.quitting?.name ?? "")?"),
+            isPresented: Binding(get: { model.quitting != nil }, set: { if !$0 { model.quitting = nil } }),
+            titleVisibility: .visible,
+            presenting: model.quitting
+        ) { game in
+            Button("Force Quit", role: .destructive) {
+                Task { await model.forceQuit(game) }
+            }
+            Button("Cancel", role: .cancel) { model.quitting = nil }
+                .keyboardShortcut(.defaultAction)
+        } message: { _ in
+            Text("Every program in the game's prefix is stopped at once, including its launcher. Progress the game has not saved is lost.")
+        }
     }
 
     @ViewBuilder
@@ -110,6 +124,12 @@ struct GamesView: View {
         }
         .disabled(game.map { model.program($0) == nil } ?? true)
         .help("Start the selected game.")
+
+        Button("Force Quit", systemImage: "xmark.octagon") {
+            model.quitting = game
+        }
+        .disabled(game == nil || model.isLoading)
+        .help("Stop the selected game when it hangs and will not close.")
 
         Button("Refresh", systemImage: "arrow.clockwise") {
             Task { await model.load() }
@@ -180,6 +200,7 @@ struct GamesView: View {
             .labelsHidden()
         }
         Divider()
+        Button("Force Quit…") { model.quitting = game }
         Button("Reveal in Finder") { PrefixTools.reveal(GameStore.prefix(of: game)) }
         Divider()
         Button("Remove Game…", role: .destructive) { model.removing = game }

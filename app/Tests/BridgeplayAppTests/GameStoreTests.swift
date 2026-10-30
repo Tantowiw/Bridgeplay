@@ -290,3 +290,67 @@ struct GamesModelTests {
         #expect(model.removing == nil)
     }
 }
+
+@Suite("Force Quit")
+struct ForceQuitTests {
+    let prefix = WinePrefix(appID: "5000000001", name: "Game", library: GameStore.library(at: URL(filePath: "/nonexistent")), lastUsed: nil)
+
+    final class Calls: @unchecked Sendable {
+        var stops = 0
+        var running = true
+    }
+
+    @Test("A prefix with nothing running is left alone")
+    func leavesAnIdlePrefixAlone() throws {
+        let calls = Calls()
+        let stopped = try PrefixTools.forceQuit(prefix, isInUse: { _ in false }, stopServer: { _ in calls.stops += 1 })
+        #expect(!stopped)
+        #expect(calls.stops == 0)
+    }
+
+    @Test("A running prefix is stopped and waited for")
+    func stopsARunningPrefix() throws {
+        let calls = Calls()
+        let stopped = try PrefixTools.forceQuit(
+            prefix, isInUse: { _ in calls.running }, stopServer: { _ in calls.stops += 1; calls.running = false })
+        #expect(stopped)
+        #expect(calls.stops == 1)
+    }
+
+    @Test("A prefix still running afterwards is reported")
+    func reportsAPrefixThatKeepsRunning() {
+        let calls = Calls()
+        #expect(throws: StepFailure.self) {
+            try PrefixTools.forceQuit(prefix, isInUse: { _ in true }, stopServer: { _ in calls.stops += 1 }, settle: 0.3)
+        }
+        #expect(calls.stops == 1)
+    }
+
+    @MainActor
+    @Test("The Games page says whether the game was stopped, and reports a failure")
+    func reportsTheOutcome() async throws {
+        let root = try scratchDirectory("games")
+        defer { try? FileManager.default.removeItem(at: root) }
+        let calls = Calls()
+        let model = GamesModel(
+            root: root, installedTools: { [] }, start: { _, _ in }, remove: { _ in },
+            stop: { game in
+                if game.name == "Stuck" { throw StepFailure(step: "Force Quit", detail: "still running") }
+                defer { calls.running = false }
+                return calls.running
+            })
+        let game = try #require(await model.add(name: "Game", tool: nil))
+        let stuck = try #require(await model.add(name: "Stuck", tool: nil))
+
+        // The dialog clears `quitting` as it closes, before its button's task runs.
+        model.quitting = game
+        model.quitting = nil
+        await model.forceQuit(game)
+        #expect(model.outcome == String(localized: "Force quit \(game.name)."))
+        await model.forceQuit(game)
+        #expect(model.outcome == String(localized: "\(game.name) is not running."))
+        await model.forceQuit(stuck)
+        #expect(model.report != nil)
+        #expect(model.quitting == nil)
+    }
+}

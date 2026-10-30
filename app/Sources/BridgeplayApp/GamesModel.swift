@@ -17,6 +17,7 @@ final class GamesModel {
 
     var selection: StandaloneGame.ID?
     var removing: StandaloneGame?
+    var quitting: StandaloneGame?
 
     var selectedGame: StandaloneGame? { games.first { $0.id == selection } }
 
@@ -24,17 +25,20 @@ final class GamesModel {
     private let installedTools: @Sendable () -> [InstalledTool]
     private let start: @Sendable (StandaloneGame, URL?) throws -> Void
     private let remove: @Sendable (StandaloneGame) throws -> Void
+    private let stop: @Sendable (StandaloneGame) throws -> Bool
 
     init(
         root: URL = SupportPaths.games,
         installedTools: @escaping @Sendable () -> [InstalledTool] = { CompatToolList.installed() },
         start: @escaping @Sendable (StandaloneGame, URL?) throws -> Void = { try GameStore.play($0, program: $1) },
-        remove: @escaping @Sendable (StandaloneGame) throws -> Void = { try GameStore.remove($0) }
+        remove: @escaping @Sendable (StandaloneGame) throws -> Void = { try GameStore.remove($0) },
+        stop: @escaping @Sendable (StandaloneGame) throws -> Bool = { try PrefixTools.forceQuit(GameStore.prefix(of: $0)) }
     ) {
         self.root = root
         self.installedTools = installedTools
         self.start = start
         self.remove = remove
+        self.stop = stop
     }
 
     func load() async {
@@ -138,6 +142,23 @@ final class GamesModel {
             try start(game, nil)
             return String(localized: "Started \(game.name).")
         }
+    }
+
+    // Takes the game rather than reading `quitting`, which the dialog clears as it closes.
+    func forceQuit(_ game: StandaloneGame) async {
+        quitting = nil
+        forgetOutcome()
+        isLoading = true
+        let stop = stop
+        do {
+            let stopped = try await Task.detached { try stop(game) }.value
+            outcome = stopped
+                ? String(localized: "Force quit \(game.name).")
+                : String(localized: "\(game.name) is not running.")
+        } catch {
+            report = FailureReport([error])
+        }
+        isLoading = false
     }
 
     // Takes the game rather than reading `removing`: the dialog clears that as it closes,
