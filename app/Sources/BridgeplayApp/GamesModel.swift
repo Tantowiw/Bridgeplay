@@ -140,8 +140,9 @@ final class GamesModel {
         }
     }
 
-    func confirmRemove() async {
-        guard let game = removing else { return }
+    // Takes the game rather than reading `removing`: the dialog clears that as it closes,
+    // before its button's task runs.
+    func removeGame(_ game: StandaloneGame) async {
         removing = nil
         forgetOutcome()
         isLoading = true

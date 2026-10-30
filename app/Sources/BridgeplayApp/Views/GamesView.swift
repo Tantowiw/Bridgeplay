@@ -67,14 +67,15 @@ struct GamesView: View {
         .confirmationDialog(
             String(localized: "Remove \(model.removing?.name ?? "")?"),
             isPresented: Binding(get: { model.removing != nil }, set: { if !$0 { model.removing = nil } }),
-            titleVisibility: .visible
-        ) {
+            titleVisibility: .visible,
+            presenting: model.removing
+        ) { game in
             Button("Remove Game", role: .destructive) {
-                Task { await model.confirmRemove() }
+                Task { await model.removeGame(game) }
             }
             Button("Cancel", role: .cancel) { model.removing = nil }
                 .keyboardShortcut(.defaultAction)
-        } message: {
+        } message: { _ in
             Text("This deletes the game's prefix, with anything installed or saved in it. A game folder outside the prefix, such as one in Downloads, is kept. Back up the prefix in Prefixes first to keep it.")
         }
     }
