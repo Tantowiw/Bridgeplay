@@ -19,26 +19,42 @@ final class GamesModel {
     var removing: StandaloneGame?
     var quitting: StandaloneGame?
 
+    static let showFPSKey = "GamesShowFPS"
+
+    // Play opens the FPS window over the game. Kept between launches of the app.
+    var showFPS: Bool {
+        didSet { defaults.set(showFPS, forKey: Self.showFPSKey) }
+    }
+
     var selectedGame: StandaloneGame? { games.first { $0.id == selection } }
 
     private let root: URL
     private let installedTools: @Sendable () -> [InstalledTool]
-    private let start: @Sendable (StandaloneGame, URL?) throws -> Void
+    private let start: @Sendable (StandaloneGame, URL?, Bool) throws -> Void
+    private let showFPSWindow: @MainActor (StandaloneGame) -> Void
+    private let defaults: UserDefaults
     private let remove: @Sendable (StandaloneGame) throws -> Void
     private let stop: @Sendable (StandaloneGame) throws -> Bool
 
     init(
         root: URL = SupportPaths.games,
         installedTools: @escaping @Sendable () -> [InstalledTool] = { CompatToolList.installed() },
-        start: @escaping @Sendable (StandaloneGame, URL?) throws -> Void = { try GameStore.play($0, program: $1) },
+        start: @escaping @Sendable (StandaloneGame, URL?, Bool) throws -> Void = {
+            try GameStore.play($0, program: $1, showFPS: $2)
+        },
         remove: @escaping @Sendable (StandaloneGame) throws -> Void = { try GameStore.remove($0) },
-        stop: @escaping @Sendable (StandaloneGame) throws -> Bool = { try PrefixTools.forceQuit(GameStore.prefix(of: $0)) }
+        stop: @escaping @Sendable (StandaloneGame) throws -> Bool = { try PrefixTools.forceQuit(GameStore.prefix(of: $0)) },
+        showFPSWindow: @escaping @MainActor (StandaloneGame) -> Void = { FPSWindow.shared.show(for: $0) },
+        defaults: UserDefaults = .standard
     ) {
         self.root = root
         self.installedTools = installedTools
         self.start = start
         self.remove = remove
         self.stop = stop
+        self.showFPSWindow = showFPSWindow
+        self.defaults = defaults
+        showFPS = defaults.bool(forKey: Self.showFPSKey)
     }
 
     func load() async {
@@ -99,7 +115,7 @@ final class GamesModel {
         panel.directoryURL = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
         guard panel.runModal() == .OK, let picked = panel.url else { return }
         act {
-            try start(game, picked)
+            try start(game, picked, false)
             return String(localized: "Started \(picked.lastPathComponent) in \(game.name). When it has finished, choose the program that starts the game.")
         }
     }
@@ -138,10 +154,14 @@ final class GamesModel {
     }
 
     func play(_ game: StandaloneGame) {
+        let fps = showFPS
+        var started = false
         act {
-            try start(game, nil)
+            try start(game, nil, fps)
+            started = true
             return String(localized: "Started \(game.name).")
         }
+        if started, fps { showFPSWindow(game) }
     }
 
     // Takes the game rather than reading `quitting`, which the dialog clears as it closes.

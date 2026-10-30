@@ -5298,6 +5298,22 @@
         }
       }
     },
+    "Frame rate of %@, from Wine's own Direct3D (wined3d). Drag to move." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frequenza dei fotogrammi di %@, dal Direct3D di Wine (wined3d). Trascina per spostare."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 的帧率，来自 Wine 自带的 Direct3D（wined3d）。拖动可移动。"
+          }
+        }
+      }
+    },
     "Free software under the GPL-3.0, with no warranty." : {
       "localizations" : {
         "it" : {
@@ -9842,6 +9858,22 @@
         }
       }
     },
+    "Show FPS" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra FPS"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示 FPS"
+          }
+        }
+      }
+    },
     "Show Log" : {
       "localizations" : {
         "it" : {
@@ -9886,6 +9918,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "在访达中显示"
+          }
+        }
+      }
+    },
+    "Show the frame rate in a small window over the game when you press Play. It counts frames Wine's own Direct3D (wined3d) draws, so games on D3DMetal, DXMT or DXVK show no number." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra la frequenza dei fotogrammi in una piccola finestra sopra il gioco quando premi Gioca. Conta i fotogrammi disegnati dal Direct3D di Wine (wined3d), quindi i giochi su D3DMetal, DXMT o DXVK non mostrano alcun numero."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按下“开始游戏”时，在游戏上方的小窗口中显示帧率。它统计 Wine 自带的 Direct3D（wined3d）绘制的帧，因此使用 D3DMetal、DXMT 或 DXVK 的游戏不会显示数字。"
           }
         }
       }

@@ -125,6 +125,10 @@ struct GamesView: View {
         .disabled(game.map { model.program($0) == nil } ?? true)
         .help("Start the selected game.")
 
+        Toggle("Show FPS", systemImage: "speedometer", isOn: Binding(get: { model.showFPS }, set: { model.showFPS = $0 }))
+            .toggleStyle(.button)
+            .help("Show the frame rate in a small window over the game when you press Play. It counts frames Wine's own Direct3D (wined3d) draws, so games on D3DMetal, DXMT or DXVK show no number.")
+
         Button("Force Quit", systemImage: "xmark.octagon") {
             model.quitting = game
         }
