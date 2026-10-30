@@ -164,11 +164,13 @@ enum GameStore {
     // game's folder as its compatdata and BRIDGEPLAY_STANDALONE set. Steam's own variables are
     // dropped, so nothing the app inherited points the run script at Steam or at another game.
     // `program` is for one that is not the game's own, such as its installer; the game's
-    // arguments are only passed to its own.
+    // arguments are only passed to its own. `showFPS` turns on wined3d's frame counter for the
+    // FPS window, on top of the WINEDEBUG the game would get anyway.
     static func launch(
         _ game: StandaloneGame, program: URL? = nil, tool: InstalledTool, root: URL = SupportPaths.games,
         compatTools: URL = SupportPaths.Steam.compatTools,
-        environment: [String: String] = ProcessInfo.processInfo.environment
+        environment: [String: String] = ProcessInfo.processInfo.environment,
+        showFPS: Bool = false, gamefixes: URL = SupportPaths.gamefixes
     ) throws -> Launch {
         let step = String(localized: "Play \(game.name)")
         guard let executable = program ?? executableURL(of: game, in: root) else {
@@ -190,6 +192,9 @@ enum GameStore {
         env["BRIDGEPLAY_STANDALONE"] = "1"
         env["STEAM_COMPAT_DATA_PATH"] = folder(of: game.id, in: root).path(percentEncoded: false)
         env["STEAM_COMPAT_INSTALL_PATH"] = executable.deletingLastPathComponent().path(percentEncoded: false)
+        if showFPS {
+            env["WINEDEBUG"] = WineFPS.debug(env["WINEDEBUG"] ?? WineFPS.confDebug(for: game.id, gamefixes: gamefixes))
+        }
         return Launch(
             run: run, arguments: ["waitforexitandrun", executable.path(percentEncoded: false)] + (program == nil ? game.arguments : []),
             environment: env, directory: executable.deletingLastPathComponent())
@@ -201,9 +206,9 @@ enum GameStore {
         return try PrefixTools.resolvedTool(step: String(localized: "Play \(game.name)"), for: prefix(of: game), among: tools)
     }
 
-    static func play(_ game: StandaloneGame, program: URL? = nil) throws {
+    static func play(_ game: StandaloneGame, program: URL? = nil, showFPS: Bool = false) throws {
         let tool = try tool(for: game)
-        let launch = try launch(game, program: program, tool: tool)
+        let launch = try launch(game, program: program, tool: tool, showFPS: showFPS)
         AppLog.note("games: play \(game.id) with \(tool.name)\(program == nil ? "" : ", running another program")")
         try Shell.detach(
             launch.run.path(percentEncoded: false), launch.arguments,

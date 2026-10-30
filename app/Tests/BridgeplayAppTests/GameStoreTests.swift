@@ -229,7 +229,8 @@ struct GamesModelTests {
         let root = try scratchDirectory("games")
         defer { try? FileManager.default.removeItem(at: root) }
         let started = Started()
-        let model = GamesModel(root: root, installedTools: { [] }, start: { started.calls.append(($0.id, $1)) })
+        let model = GamesModel(root: root, installedTools: { [] }, start: { game, program, _ in started.calls.append((game.id, program)) },
+            defaults: try #require(UserDefaults(suiteName: "games-\(UUID().uuidString)")))
 
         let game = try #require(await model.add(name: "Game", tool: nil))
         #expect(model.games.map(\.id) == [game.id])
@@ -268,7 +269,7 @@ struct GamesModelTests {
         let root = try scratchDirectory("games")
         defer { try? FileManager.default.removeItem(at: root) }
         let model = GamesModel(
-            root: root, installedTools: { [] }, start: { _, _ in },
+            root: root, installedTools: { [] }, start: { _, _, _ in },
             remove: { game in
                 if game.name == "Busy" { throw StepFailure(step: "Remove", detail: "running") }
                 try FileManager.default.removeItem(at: GameStore.folder(of: game.id, in: root))
@@ -333,7 +334,7 @@ struct ForceQuitTests {
         defer { try? FileManager.default.removeItem(at: root) }
         let calls = Calls()
         let model = GamesModel(
-            root: root, installedTools: { [] }, start: { _, _ in }, remove: { _ in },
+            root: root, installedTools: { [] }, start: { _, _, _ in }, remove: { _ in },
             stop: { game in
                 if game.name == "Stuck" { throw StepFailure(step: "Force Quit", detail: "still running") }
                 defer { calls.running = false }
@@ -352,5 +353,114 @@ struct ForceQuitTests {
         await model.forceQuit(stuck)
         #expect(model.report != nil)
         #expect(model.quitting == nil)
+    }
+}
+
+@Suite("FPS window")
+struct WineFPSTests {
+    @Test("Readings come only from the fps trace lines")
+    func readsTheTraceLines() {
+        let log = """
+        014c:trace:fps:wglSwapBuffers @ approx 0.00fps, total 0.00fps
+        014c:trace:fps:wined3d_cs_exec_present 014AF908 @ approx 112.29fps
+        0250:err:d3d:wined3d_swapchain_resize_buffers Something's still holding back buffer 0 (12F5B1C0).
+        info:  the game said @ approx 99.00fps
+        014c:trace:fps:wined3d_cs_exec_present 014AF908 @ approx 117.80fps
+        """
+        #expect(WineFPS.readings(in: log) == [0, 112.29, 117.80])
+    }
+
+    @Test("WINEDEBUG keeps what the game gets and adds the fps channel once")
+    func addsTheChannel() {
+        #expect(WineFPS.debug(nil) == "err+all,fixme-all,trace+fps")
+        #expect(WineFPS.debug("") == "err+all,fixme-all,trace+fps")
+        #expect(WineFPS.debug("+loaddll") == "+loaddll,trace+fps")
+        #expect(WineFPS.debug("err+all,+fps") == "err+all,+fps")
+        #expect(WineFPS.debug("-fps") == "-fps")
+    }
+
+    @Test("The reader follows a growing log, skips what was there and starts over when the log is new")
+    func followsTheLog() throws {
+        let dir = try scratchDirectory("fps")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let log = dir.appending(path: "bridgeplay-wine.log")
+        try Data("0001:trace:fps:x @ approx 30.00fps\n".utf8).write(to: log)
+
+        var reader = WineFPS.Reader(url: log)
+        #expect(reader.read().isEmpty)
+
+        let handle = try FileHandle(forWritingTo: log)
+        try handle.seekToEnd()
+        try handle.write(contentsOf: Data("0001:trace:fps:x @ approx 58.10fps\n0001:trace:fps:x @ appr".utf8))
+        #expect(reader.read() == [58.10])
+        try handle.write(contentsOf: Data("ox 59.90fps\n".utf8))
+        #expect(reader.read() == [59.90])
+        try handle.close()
+
+        // The next launch starts the log afresh.
+        try Data("0001:trace:fps:x @ approx 12.50fps\n".utf8).write(to: log)
+        #expect(reader.read() == [12.50])
+    }
+
+    @Test("Show FPS adds the channel to the WINEDEBUG the game's confs set")
+    func launchesWithTheChannel() throws {
+        let work = try scratchDirectory("fps")
+        defer { try? FileManager.default.removeItem(at: work) }
+        let root = work.appending(path: "games")
+        let tools = work.appending(path: "compatibilitytools.d")
+        let gamefixes = work.appending(path: "gamefixes")
+        let tool = InstalledTool(tool: CompatTool(name: "t", flavor: .rosetta, display: "T"), build: "b")
+        let run = tools.appending(path: "t/run")
+        try FileManager.default.createDirectory(at: run.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try Data("#!/bin/sh\n".utf8).write(to: run)
+        try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: run.path)
+        let exe = work.appending(path: "Game/Game.exe")
+        try FileManager.default.createDirectory(at: exe.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try Data().write(to: exe)
+        var game = try GameStore.add(name: "Game", in: root)
+        game.executable = exe.path(percentEncoded: false)
+
+        func debug(_ show: Bool, _ environment: [String: String] = [:]) throws -> String? {
+            try GameStore.launch(game, tool: tool, root: root, compatTools: tools, environment: environment,
+                                 showFPS: show, gamefixes: gamefixes).environment["WINEDEBUG"]
+        }
+        #expect(try debug(false) == nil)
+        #expect(try debug(true) == "err+all,fixme-all,trace+fps")
+
+        try FileManager.default.createDirectory(at: gamefixes, withIntermediateDirectories: true)
+        try Data("WINEDEBUG=+seh\n".utf8).write(to: gamefixes.appending(path: "default.conf"))
+        try Data("RETINA=0\nWINEDEBUG=+loaddll\n".utf8).write(to: gamefixes.appending(path: "\(game.id).conf"))
+        #expect(try debug(true) == "+loaddll,trace+fps")
+        #expect(try debug(true, ["WINEDEBUG": "warn+all"]) == "warn+all,trace+fps")
+    }
+
+    final class Calls: @unchecked Sendable {
+        var flags: [Bool] = []
+    }
+
+    @MainActor
+    @Test("Play opens the FPS window only when Show FPS is on, and the choice is kept")
+    func opensTheWindow() async throws {
+        let root = try scratchDirectory("games")
+        defer { try? FileManager.default.removeItem(at: root) }
+        let suite = "games-\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let calls = Calls()
+        var windows: [String] = []
+        let model = GamesModel(
+            root: root, installedTools: { [] }, start: { _, _, fps in calls.flags.append(fps) },
+            showFPSWindow: { windows.append($0.id) }, defaults: defaults)
+        let game = try #require(await model.add(name: "Game", tool: nil))
+
+        #expect(!model.showFPS)
+        model.play(game)
+        model.showFPS = true
+        model.play(game)
+        #expect(calls.flags == [false, true])
+        #expect(windows == [game.id])
+
+        let again = GamesModel(root: root, installedTools: { [] }, defaults: defaults)
+        #expect(again.showFPS)
     }
 }
