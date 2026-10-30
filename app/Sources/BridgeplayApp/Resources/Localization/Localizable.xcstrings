@@ -12488,6 +12488,22 @@
     "Winetricks" : {
       "shouldTranslate" : false
     },
+    "Winetricks needs cabextract for %@, and neither this engine nor macOS includes it. Install it with Homebrew (brew install cabextract), then try again." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Winetricks ha bisogno di cabextract per %@, ma né questo motore né macOS lo includono. Installalo con Homebrew (brew install cabextract), poi riprova."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Winetricks 需要 cabextract 来安装 %@，但此引擎和 macOS 都未包含它。请用 Homebrew 安装（brew install cabextract），然后重试。"
+          }
+        }
+      }
+    },
     "Winetricks ran %@ in %@." : {
       "localizations" : {
         "it" : {

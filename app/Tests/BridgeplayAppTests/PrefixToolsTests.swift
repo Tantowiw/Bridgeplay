@@ -324,6 +324,105 @@ struct PrefixToolsTests {
         #expect(!FileManager.default.fileExists(atPath: script.path(percentEncoded: false)), "the swapped script stays cached")
     }
 
+    // Shaped like winetricks: verbs reach cabextract directly, through a helper or by w_call.
+    private static let cabScript = """
+        #!/bin/sh
+        w_try_cabextract()
+        {
+            # Not always installed
+            w_try cabextract -q "$@"
+        }
+
+        helper_d3dx9_xx()
+        {
+            w_try_cabextract -d "${W_TMP}" -L -F "*${1}*x86*" "${W_CACHE}"/directx9/redist.exe
+        }
+
+        load_d3dcompiler_43()
+        {
+            helper_d3dx9_xx d3dcompiler_43
+        }
+
+        load_xact() {
+            w_try_cabextract -d "${W_TMP}" -L -F '*_xact_*x86*' redist.exe
+        }
+
+        load_allcodecs()
+        {
+            w_call xact
+        }
+
+        load_corefonts()
+        {
+            # cabextract is not needed here, helper_d3dx9_xx only in a comment
+            w_try "${WINE}" fonts.exe
+        }
+
+        echo "path $PATH"
+        command -v cabextract || true
+        """
+
+    @Test("Winetricks knows which verbs unpack a cabinet")
+    func winetricksFindsCabextractVerbs() {
+        let verbs = ["d3dcompiler_43", "xact", "allcodecs", "corefonts", "win10", "renderer=gl"]
+        #expect(PrefixTools.cabextractVerbs(verbs, script: Self.cabScript) == ["d3dcompiler_43", "xact", "allcodecs"])
+        #expect(PrefixTools.cabextractVerbs(["d3dcompiler_43"], script: "").isEmpty)
+    }
+
+    @Test("Winetricks finds cabextract or refuses a verb that needs it before downloading")
+    func winetricksNeedsCabextract() throws {
+        let dir = FileManager.default.temporaryDirectory.appending(path: "np-winetricks-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let library = SteamLibrary(root: dir.appending(path: "library"))
+        let prefix = WinePrefix(appID: "2075800", name: "Game", library: library, lastUsed: nil)
+        let runner = dir.appending(path: "runner")
+        let unix = runner.appending(path: "lib/wine/x86_64-unix")
+        let brew = dir.appending(path: "brew/bin")
+        for folder in [prefix.pfx, unix, brew, dir.appending(path: "cache")] {
+            try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        }
+        func executable(_ url: URL, _ body: String) throws {
+            try Data(body.utf8).write(to: url)
+            try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: url.path(percentEncoded: false))
+        }
+        try executable(unix.appending(path: "wine"), "#!/bin/sh\nexit 0\n")
+        let script = dir.appending(path: "cache/winetricks")
+        try executable(script, Self.cabScript)
+        let log = prefix.root.appending(path: PrefixTools.winetricksLogName)
+
+        let failure = try #require(throws: StepFailure.self) {
+            try PrefixTools.winetricks(
+                ["corefonts", "d3dcompiler_43", "xact"], in: prefix, script: script, runner: runner,
+                cabextractFolders: [])
+        }
+        #expect(failure.detail.contains("d3dcompiler_43"))
+        #expect(failure.detail.contains("xact"))
+        #expect(!failure.detail.contains("corefonts"))
+        #expect(failure.detail.contains("brew install cabextract"))
+        #expect(!FileManager.default.fileExists(atPath: log.path(percentEncoded: false)), "winetricks ran")
+
+        // A verb that needs no cabinet still runs without it.
+        _ = try PrefixTools.winetricks(["corefonts"], in: prefix, script: script, runner: runner, cabextractFolders: [])
+        try FileManager.default.removeItem(at: log)
+
+        // Homebrew's copy is put on PATH, after the folders already there.
+        try executable(brew.appending(path: "cabextract"), "#!/bin/sh\nexit 0\n")
+        _ = try PrefixTools.winetricks(
+            ["d3dcompiler_43"], in: prefix, script: script, runner: runner,
+            cabextractFolders: [brew.path(percentEncoded: false)])
+        #expect(try String(contentsOf: log, encoding: .utf8).contains(":\(brew.path(percentEncoded: false))\n"))
+        try FileManager.default.removeItem(at: log)
+
+        // The runner's own, as CrossOver ships, comes first.
+        let bin = runner.appending(path: "bin")
+        try FileManager.default.createDirectory(at: bin, withIntermediateDirectories: true)
+        try executable(bin.appending(path: "cabextract"), "#!/bin/sh\nexit 0\n")
+        _ = try PrefixTools.winetricks(
+            ["d3dcompiler_43"], in: prefix, script: script, runner: runner,
+            cabextractFolders: [brew.path(percentEncoded: false)])
+        #expect(try String(contentsOf: log, encoding: .utf8).contains(bin.appending(path: "cabextract").path(percentEncoded: false)))
+    }
+
     @Test("Every kind offered by the file picker is a kind that can be run")
     func pickerTypesMatchWhatRuns() {
         let extensions = PrefixTools.runnableTypes.compactMap(\.preferredFilenameExtension)

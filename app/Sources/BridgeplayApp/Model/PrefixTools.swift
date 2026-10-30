@@ -292,6 +292,54 @@ enum PrefixTools {
         text.split(whereSeparator: \.isWhitespace).map(String.init)
     }
 
+    // Winetricks unpacks Microsoft cabinets with cabextract. CrossOver keeps one in its bin;
+    // the free engines and macOS have none, so one from Homebrew or MacPorts is used instead.
+    static var cabextractFolders: [String] {
+        (ProcessInfo.processInfo.environment["PATH"] ?? "").split(separator: ":").map(String.init)
+            + ["/opt/homebrew/bin", "/usr/local/bin", "/opt/local/bin"]
+    }
+
+    static func cabextractFolder(runner: URL, among folders: [String]) -> String? {
+        ([runner.appending(path: "bin").path(percentEncoded: false)] + folders)
+            .first { FileManager.default.isExecutableFile(atPath: "\($0)/cabextract") }
+    }
+
+    // The verbs whose load_ function reaches cabextract, itself, through a helper or through
+    // w_call. Read from the script, so the answer follows the pinned release.
+    static func cabextractVerbs(_ verbs: [String], script: String) -> [String] {
+        var callees: [String: Set<String>] = [:]
+        var name: String?
+        var body: [Substring] = []
+        for line in script.split(separator: "\n", omittingEmptySubsequences: false) {
+            if let current = name {
+                if line == "}" {
+                    let code = body.joined(separator: "\n")
+                    var called = Set(code.split { !($0.isLetter || $0.isNumber || $0 == "_") }.map(String.init))
+                    for call in code.matches(of: /\bw_(?:do_)?call\s+([A-Za-z0-9_]+)/) {
+                        called.insert("load_\(call.1)")
+                    }
+                    callees[current] = called
+                    name = nil
+                } else if !line.drop(while: \.isWhitespace).hasPrefix("#") {
+                    body.append(line)
+                }
+            } else if let match = line.wholeMatch(of: /([A-Za-z_][A-Za-z0-9_]*)\(\)\s*\{?\s*/) {
+                name = String(match.1)
+                body = []
+            }
+        }
+        var reaches: Set<String> = ["cabextract"]
+        var grew = true
+        while grew {
+            grew = false
+            for (function, called) in callees where !reaches.contains(function) && !called.isDisjoint(with: reaches) {
+                reaches.insert(function)
+                grew = true
+            }
+        }
+        return verbs.filter { reaches.contains("load_\($0)") }
+    }
+
     static func winetricks(_ verbs: [String], in prefix: WinePrefix) async throws -> URL {
         let step = String(localized: "Run Winetricks")
         let chosen = try resolvedTool(step: step, for: prefix)
@@ -314,7 +362,8 @@ enum PrefixTools {
     // user's to write, so it is read once, checked, and the checked bytes are what runs.
     static func winetricks(
         _ verbs: [String], in prefix: WinePrefix, script: URL, runner: URL,
-        flavor: CompatTool.Flavor = .fex, sha256: String? = nil
+        flavor: CompatTool.Flavor = .fex, sha256: String? = nil,
+        cabextractFolders: [String] = PrefixTools.cabextractFolders
     ) throws -> URL {
         let step = String(localized: "Run Winetricks")
         guard !verbs.isEmpty else {
@@ -338,7 +387,6 @@ enum PrefixTools {
             throw StepFailure(step: step, detail: error.localizedDescription)
         }
 
-        // cabextract comes from the runner's bin, which environment() puts on PATH.
         var environment = environment(prefix: prefix, runner: runner, flavor: flavor)
         environment["WINE"] = wrapper.path(percentEncoded: false)
         environment["BRIDGEPLAY_WINE"] = loader.path(percentEncoded: false)
@@ -347,6 +395,23 @@ enum PrefixTools {
 
         let checked = try sha256.map { try verifiedCopy(of: script, sha256: $0, step: step) }
         defer { if let checked { try? FileManager.default.removeItem(at: checked.deletingLastPathComponent()) } }
+
+        // Without cabextract Winetricks would stop only after downloading the verb's installers.
+        if let folder = cabextractFolder(runner: runner, among: cabextractFolders) {
+            let path = environment["PATH"] ?? ""
+            if !path.split(separator: ":").contains(Substring(folder)) {
+                environment["PATH"] = path + ":" + folder
+            }
+        } else {
+            let text = (try? String(contentsOf: checked ?? script, encoding: .utf8)) ?? ""
+            let needing = cabextractVerbs(verbs, script: text)
+            guard needing.isEmpty else {
+                throw StepFailure(
+                    step: step,
+                    detail: String(localized: "Winetricks needs cabextract for \(needing.formatted(.list(type: .and))), and neither this engine nor macOS includes it. Install it with Homebrew (brew install cabextract), then try again.")
+                )
+            }
+        }
 
         let log = prefix.root.appending(path: winetricksLogName)
         let status = try Shell.logged(
