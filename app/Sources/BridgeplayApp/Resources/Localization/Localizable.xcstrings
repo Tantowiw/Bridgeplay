@@ -497,6 +497,22 @@
         }
       }
     },
+    "%@ is not running." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ non è in esecuzione."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 没有在运行。"
+          }
+        }
+      }
+    },
     "%@ is not signed by Valve. Expected TeamIdentifier=%@." : {
       "localizations" : {
         "it" : {
@@ -557,6 +573,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ 正在运行。请先退出游戏。"
+          }
+        }
+      }
+    },
+    "%@ is still running after Force Quit. Try again, or restart the Mac if it keeps running." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ è ancora in esecuzione dopo l'uscita forzata. Riprova, oppure riavvia il Mac se continua a essere in esecuzione."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "强制退出后 %@ 仍在运行。请重试；如果仍在运行，请重新启动 Mac。"
           }
         }
       }
@@ -4866,6 +4898,22 @@
         }
       }
     },
+    "Every program in the game's prefix is stopped at once, including its launcher. Progress the game has not saved is lost." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutti i programmi nel prefisso del gioco vengono interrotti subito, launcher incluso. I progressi non salvati dal gioco vanno persi."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "游戏容器中的所有程序都会立即停止，包括启动器。游戏尚未保存的进度将会丢失。"
+          }
+        }
+      }
+    },
     "Every setting on the Bridgeplay tab" : {
       "localizations" : {
         "it" : {
@@ -5122,6 +5170,38 @@
         }
       }
     },
+    "Force Quit" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uscita forzata"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "强制退出"
+          }
+        }
+      }
+    },
+    "Force Quit…" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uscita forzata…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "强制退出…"
+          }
+        }
+      }
+    },
     "Force VSync" : {
       "localizations" : {
         "it" : {
@@ -5134,6 +5214,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "强制垂直同步"
+          }
+        }
+      }
+    },
+    "Force quit %@." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uscita forzata da %@ eseguita."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已强制退出 %@。"
+          }
+        }
+      }
+    },
+    "Force quit %@?" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forzare l'uscita da %@?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "强制退出 %@？"
           }
         }
       }
@@ -10833,6 +10945,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "仍在启动…"
+          }
+        }
+      }
+    },
+    "Stop the selected game when it hangs and will not close." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interrompi il gioco selezionato quando si blocca e non si chiude."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在所选游戏卡住且无法关闭时停止它。"
           }
         }
       }

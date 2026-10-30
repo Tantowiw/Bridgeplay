@@ -507,6 +507,42 @@ enum PrefixTools {
         )
     }
 
+    // Ends every process in the prefix, for a game that hangs and will not close. false when
+    // nothing was running. The run script waiting on the game then winds the session down.
+    static func forceQuit(
+        _ prefix: WinePrefix,
+        isInUse: (WinePrefix) -> Bool = { PrefixStore.isInUse($0) },
+        stopServer: (WinePrefix) throws -> Void = { try killServer(of: $0) },
+        settle: TimeInterval = 10
+    ) throws -> Bool {
+        guard isInUse(prefix) else { return false }
+        try stopServer(prefix)
+        let deadline = Date.now.addingTimeInterval(settle)
+        while isInUse(prefix) {
+            guard Date.now < deadline else {
+                throw StepFailure(
+                    step: String(localized: "Force Quit"),
+                    detail: String(localized: "\(prefix.title) is still running after Force Quit. Try again, or restart the Mac if it keeps running.")
+                )
+            }
+            Thread.sleep(forTimeInterval: 0.25)
+        }
+        AppLog.note("force quit: \(prefix.appID)")
+        return true
+    }
+
+    // wineserver -k from the build that runs the prefix, since a server only answers a client
+    // of its own version.
+    static func killServer(of prefix: WinePrefix) throws {
+        let step = String(localized: "Force Quit")
+        let chosen = try resolvedTool(step: step, for: prefix)
+        let runner = SupportPaths.clonedRoot(forBuild: chosen.build)
+        let server = layout(runner: runner, flavor: chosen.tool.flavor).server
+        _ = try Shell.run(
+            server.path(percentEncoded: false), ["-k"],
+            environment: environment(prefix: prefix, runner: runner, flavor: chosen.tool.flavor))
+    }
+
     static func delete(_ prefix: WinePrefix) throws {
         try refuseIfGame(prefix, step: String(localized: "Delete prefix"))
         guard let claim = PrefixStore.claim(prefix) else {
