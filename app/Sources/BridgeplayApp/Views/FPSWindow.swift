@@ -1,6 +1,8 @@
 // A small window over the game with the frame rate wined3d writes to its Wine log, see
 // WineFPS. It belongs to Bridgeplay, not to the game's process, so nothing is added to the
-// game itself. It closes once the game's prefix has nothing running.
+// game itself. It closes once the game's prefix has nothing running. Wine writes a reading
+// every 1.5 seconds (wined3d_cs_exec_present, wglSwapBuffers), averaged over that stretch,
+// so the window can follow no faster; it reads the log often to add little on top.
 
 import AppKit
 import Observation
@@ -61,9 +63,10 @@ final class FPSWindow {
                     reading.fps = latest
                     lastFrame = .now
                 }
-                reading.stalled = lastFrame.map { Date.now.timeIntervalSince($0) > 2.5 } ?? false
-                // lsof is slower than reading the log, so the session is checked less often.
-                if tick % 5 == 0 {
+                // Longer than Wine's 1.5-second stretch with no reading: no frames are coming.
+                reading.stalled = lastFrame.map { Date.now.timeIntervalSince($0) > 3 } ?? false
+                // lsof is slower than reading the log, so the session is checked every 5 seconds.
+                if tick % 20 == 0 {
                     let running = await Task.detached { PrefixStore.isInUse(prefix) }.value
                     if running {
                         seenRunning = true
@@ -72,7 +75,7 @@ final class FPSWindow {
                     }
                 }
                 tick += 1
-                try? await Task.sleep(for: .seconds(1))
+                try? await Task.sleep(for: .milliseconds(250))
             }
             self?.close(id)
         }
