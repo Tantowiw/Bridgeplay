@@ -263,7 +263,7 @@ struct GamesModelTests {
         #expect(started.calls.first?.1 == nil)
     }
 
-    @Test("Removing asks first, and a refusal is reported")
+    @Test("Removing takes the confirmed game even after the dialog cleared it, and a refusal is reported")
     func removesAfterConfirming() async throws {
         let root = try scratchDirectory("games")
         defer { try? FileManager.default.removeItem(at: root) }
@@ -276,16 +276,15 @@ struct GamesModelTests {
         let busy = try #require(await model.add(name: "Busy", tool: nil))
         let gone = try #require(await model.add(name: "Gone", tool: nil))
 
-        await model.confirmRemove()
-        #expect(model.games.count == 2)
-
         model.removing = busy
-        await model.confirmRemove()
+        await model.removeGame(busy)
         #expect(model.report != nil)
         #expect(model.games.count == 2)
 
+        // The dialog clears `removing` as it closes, before its button's task runs.
         model.removing = gone
-        await model.confirmRemove()
+        model.removing = nil
+        await model.removeGame(gone)
         #expect(model.report == nil)
         #expect(model.games.map(\.id) == [busy.id])
         #expect(model.removing == nil)
