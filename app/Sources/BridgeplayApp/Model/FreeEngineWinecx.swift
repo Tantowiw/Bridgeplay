@@ -65,7 +65,8 @@ struct WinecxRelease: Sendable {
     // What the NVIDIA identity D3DMetal is given needs from the engine (NVAPI=1): crypt32 and
     // wintrust that let Streamline load Apple's unsigned NGX bridge (ngx-signer-patch/), a
     // native nvapi64 reporting a current driver (nvapi-shim/), and a win32u whose display
-    // class DriverVersion says the same (win32u-patch/). Empty where none of it ships.
+    // class DriverVersion says the same (win32u-patch/). That win32u also gives legacy GL
+    // contexts their extensions back. Empty where none of it ships.
     let nvidia: [WinecxBundledFile]
     // winecoreaudio.so rebuilt so an output stream asks CoreAudio for half a period per
     // pull, not a whole one, which Wine padded with silence and was heard as crackling
@@ -202,11 +203,12 @@ enum FreeEngineWinecx {
             WinecxBundledFile(resource: "nvapi64-shim", ext: "dll",
                               path: "lib/notproton-backends/nvapi-shim/x86_64-windows/nvapi64.dll",
                               sha256: "a80aea6347a8b1e72542e458f410d37fdedb39e194c0fcee45a5ae6cd7f571be"),
-            // win32u.so: runtime 4.7.3's, with NVIDIA's DriverVersion 35.0.15.9541 (595.41) by
+            // win32u.so: winecx e0aa380's with win32u-patch/winecx-legacy-gl-extensions.patch
+            // (Wine 1c2d9098), then NVIDIA's DriverVersion 35.0.15.9541 (595.41) by
             // win32u-patch/patch-driver-version.sh, signed ad hoc.
             WinecxBundledFile(resource: "win32u-winecx-11.17", ext: "so",
                               path: "lib/wine/x86_64-unix/win32u.so",
-                              sha256: "b012382d09b2ff1b3c0750d93867f72dd04a7c902bc4179be406b6c558ab162d"),
+                              sha256: "30dfff79def32f1b238e45f09d293c6da5e7f00619ae7f61784546755a772889"),
             // wined3d.dll: winecx e0aa380's PE half with wined3d-patch/winecx-driver-version.patch
             // (NOTPROTON_DRIVER_VERSION replaces the GeForce 8 era driver version d3d9 reports).
             WinecxBundledFile(resource: "wined3d-winecx-11.17", ext: "dll",

@@ -333,6 +333,23 @@ the source checked out as `winecx/` beside the build directory (wbemprox's asser
 --strip-debug`. Built without the patch, it is byte-identical to the runtime's `wbemprox.dll`
 except the PE timestamp, checksum and build id. 11.15 keeps the runtime's own.
 
+## Legacy GL extensions
+
+A legacy (< 3.0) WGL context, what a plain `wglCreateContext` gives, reported no GL
+extensions: `win32u`'s `parse_current_extensions()` parsed `GL_EXTENSIONS` into a local array
+that shadowed its argument, so `glGetString(GL_EXTENSIONS)` returned only
+`WGL_EXT_extensions_string WGL_EXT_swap_control`. DW3 Online (libGDX on Java 17) then stopped
+with "OpenGL 2.0 or higher with the FBO extension is required. OpenGL version: 2.1 Metal -
+91.7, FBO extension: false". wined3d asks for a core context and was not affected.
+
+11.17 ships `win32u-winecx-11.17.so` built from winecx `e0aa380` with
+`win32u-patch/winecx-legacy-gl-extensions.patch`, Wine commit `1c2d9098` (Wine 11.19), before
+the driver-version edit it already carried. The same 2.1 context then lists 132 extensions,
+the framebuffer-object ones among them. The build reproduces the runtime's `win32u.so` without
+the patch; recipe and pins are in `win32u-patch/README.md`. The pin is the release's
+`nvidia`. Wine 11.15 has the same bug in `dlls/opengl32/unix_wgl.c` (`extensions[i] = TRUE`),
+so the 11.15 build and the WineHQ engine still have it.
+
 ## D3DMetal: the builtin model
 
 Apple's forwarders only work as builtins: only a builtin gets its unix half
@@ -527,7 +544,7 @@ rebuilt Mach-O file needs its line there updated too; `SignedPinTests` fails unt
 | `crypt32-winecx-11.17.dll` | `ngx-signer-patch/` | `27b485cc2a6bf651d8d72173e5d40dbc914666d3f8e8f6a4031a91c5ff22ebbf` | `FreeEngineWinecx.v1117.nvidia` |
 | `wintrust-winecx-11.17.dll` | `ngx-signer-patch/` | `256f3b7106cb8f7f390e1551f209bfb72ccf43744d6d583e5664e44d7602bfee` | `FreeEngineWinecx.v1117.nvidia` |
 | `nvapi64-shim.dll` | `nvapi-shim/` | `a80aea6347a8b1e72542e458f410d37fdedb39e194c0fcee45a5ae6cd7f571be` | `FreeEngineWinecx.v1117.nvidia` |
-| `win32u-winecx-11.17.so` | `win32u-patch/patch-driver-version.sh` | `b012382d09b2ff1b3c0750d93867f72dd04a7c902bc4179be406b6c558ab162d` | `FreeEngineWinecx.v1117.nvidia` |
+| `win32u-winecx-11.17.so` | `win32u-patch/` | `30dfff79def32f1b238e45f09d293c6da5e7f00619ae7f61784546755a772889` | `FreeEngineWinecx.v1117.nvidia` |
 | `wined3d-winecx-11.17.dll` | `wined3d-patch/` | `9298c83d927b3b80d0fa36f52bb5f2ecd60ec4daffff3c93d9b080293e59dfe9` | `FreeEngineWinecx.v1117.nvidia` |
 | `winecoreaudio-winecx-11.17.so` | `winecoreaudio-patch/` | `680b267e8cf41af0868de4adf7f6760615a434a4be06b4ab0cfeece2d9240faa` | `FreeEngineWinecx.v1117.audio` |
 | `mmdevapi-winecx-11.17.dll` | `mmdevapi-patch/` | `02fe4297e27f072f97936588405a93367ff64f7141b77a24cfbffd3cd4c0833f` | `FreeEngineWinecx.v1117.audio` |

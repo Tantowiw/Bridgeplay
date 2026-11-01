@@ -59,8 +59,10 @@ patches, built by scripts/package-wine-patch-sources.sh (see the written offer
 below for the current archive's name and sha256).
 
   WineCX 11.17 (winecx e0aa380780b73e20fabcfe78fd42713b94929a53, runtime 4.7.3):
-    win32u-winecx-11.17.so        win32u-patch/patch-driver-version.sh (binary
-                                  string edit of the runtime's win32u.so)
+    win32u-winecx-11.17.so        win32u-patch/winecx-legacy-gl-extensions.patch
+                                  (Wine commit 1c2d9098 by Rémi Bernon), then
+                                  win32u-patch/patch-driver-version.sh (binary
+                                  string edit)
     winemac-winecx-11.17.so       winemac-patch/winecx-11.17-d3dmetal-retina.patch
     winebus-winecx-11.17.so       unmodified source, built with SDL2 support
     winebus-winecx-11.17.sys      winebus-patch/winecx-sdl-mappings.patch
