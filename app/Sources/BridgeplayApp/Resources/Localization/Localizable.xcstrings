@@ -449,6 +449,12 @@
             "value" : "%1$@ non ha uno script di avvio in %2$@. Configura di nuovo lo strumento di compatibilità."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У %@ нет скрипта запуска по пути %@. Установите инструмент совместимости заново."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -551,6 +557,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ è installato in questo prefisso, quindi eliminare o ricreare il prefisso rimuoverebbe il gioco."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ установлена внутри этого префикса, поэтому удаление или пересоздание префикса удалит игру."
           }
         },
         "zh-Hans" : {
@@ -701,6 +713,12 @@
             "value" : "%@ non è in esecuzione."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ не запущена."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -803,6 +821,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ è ancora in esecuzione dopo l'uscita forzata. Riprova, oppure riavvia il Mac se continua a essere in esecuzione."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ всё ещё работает после принудительного завершения. Попробуйте снова или перезагрузите Mac, если она не закрывается."
           }
         },
         "zh-Hans" : {
@@ -1932,6 +1956,12 @@
             "value" : "Adattiva (riempie fino alla frequenza del display)"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Адаптивный (до частоты обновления дисплея)"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2036,6 +2066,12 @@
             "value" : "Aggiungi un gioco Windows che non viene da Steam."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить игру для Windows не из Steam."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2050,6 +2086,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aggiungi un gioco Windows che non viene da Steam. Bridgeplay gli dà un prefisso tutto suo e lo avvia senza Steam."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавьте игру для Windows не из Steam. Bridgeplay создаст для неё отдельный префикс и запустит её без Steam."
           }
         },
         "zh-Hans" : {
@@ -2090,6 +2132,12 @@
             "value" : "Aggiungi e scegli il programma di installazione…"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить и выбрать установщик…"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2104,6 +2152,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aggiungi gioco"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить игру"
           }
         },
         "zh-Hans" : {
@@ -2186,6 +2240,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aggiunto %@. Esegui il suo programma di installazione per installarlo nel suo prefisso."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ добавлена. Запустите её установщик, чтобы установить игру в её собственный префикс."
           }
         },
         "zh-Hans" : {
@@ -4957,6 +5017,12 @@
             "value" : "Scegli il programma…"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать программу…"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4995,6 +5061,12 @@
             "value" : "Scegli la grafica, la generazione fotogrammi e le altre impostazioni con cui gira il gioco selezionato."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите графику, генерацию кадров и другие настройки, с которыми запускается выбранная игра."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5009,6 +5081,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scegli il programma di installazione di %@. Viene eseguito nel prefisso del gioco."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите установщик для %@. Он запустится в собственном префиксе игры."
           }
         },
         "zh-Hans" : {
@@ -5027,6 +5105,12 @@
             "value" : "Scegli il programma che Gioca avvia, ad esempio il launcher del gioco, nel suo prefisso o in una cartella a parte."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите программу, которую запускает кнопка «Играть», например лаунчер игры, внутри её префикса или в отдельной папке."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5043,6 +5127,12 @@
             "value" : "Scegli prima il programma che avvia %@."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сначала выберите программу, которая запускает %@."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5057,6 +5147,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scegli il programma che avvia %@."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите программу, которая запускает %@."
           }
         },
         "zh-Hans" : {
@@ -6068,6 +6164,12 @@
             "value" : "Predefinito"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По умолчанию"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6082,6 +6184,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Predefinito (%@)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По умолчанию (%@)"
           }
         },
         "zh-Hans" : {
@@ -7332,6 +7440,12 @@
             "value" : "Tutti i programmi nel prefisso del gioco vengono interrotti subito, launcher incluso. I progressi non salvati dal gioco vanno persi."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все программы в префиксе игры, включая лаунчер, будут сразу остановлены. Несохранённый прогресс будет потерян."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7700,6 +7814,12 @@
             "value" : "Uscita forzata"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завершить принудительно"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7714,6 +7834,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Uscita forzata…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завершить принудительно…"
           }
         },
         "zh-Hans" : {
@@ -7754,6 +7880,12 @@
             "value" : "Uscita forzata da %@ eseguita."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ завершена принудительно."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7768,6 +7900,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Forzare l'uscita da %@?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Принудительно завершить %@?"
           }
         },
         "zh-Hans" : {
@@ -7962,6 +8100,12 @@
             "value" : "Frequenza dei fotogrammi di %@, dal Direct3D di Wine (wined3d). Trascina per spostare."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Частота кадров %@ из собственного Direct3D Wine (wined3d). Перетащите, чтобы переместить."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8132,6 +8276,12 @@
             "value" : "Impostazioni del gioco"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки игры"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8146,6 +8296,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Impostazioni del gioco…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки игры…"
           }
         },
         "zh-Hans" : {
@@ -8184,6 +8340,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Giochi"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Игры"
           }
         },
         "zh-Hans" : {
@@ -8442,6 +8604,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dai un nome al gioco."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Укажите название игры."
           }
         },
         "zh-Hans" : {
@@ -8741,6 +8909,12 @@
     "ID" : {
       "localizations" : {
         "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID"
+          }
+        },
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "ID"
@@ -9972,6 +10146,12 @@
             "value" : "Elenca di nuovo i giochi."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновить список игр."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10052,6 +10232,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ricerca dei giochi"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поиск игр"
           }
         },
         "zh-Hans" : {
@@ -10422,6 +10608,12 @@
             "value" : "Nome"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Название"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10436,6 +10628,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dai un nome al gioco, poi scegli il suo programma di installazione. Bridgeplay lo esegue nel prefisso del gioco, senza Steam."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Назовите игру, затем выберите её установщик. Bridgeplay запустит установщик в собственном префиксе игры, без Steam."
           }
         },
         "zh-Hans" : {
@@ -10564,6 +10762,12 @@
             "value" : "Nuovo gioco"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новая игра"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10578,6 +10782,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nuovo gioco…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новая игра…"
           }
         },
         "zh-Hans" : {
@@ -10616,6 +10826,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nessun gioco"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет игр"
           }
         },
         "zh-Hans" : {
@@ -10720,6 +10936,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nessun ID di gioco libero trovato in %@."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В %@ не найден свободный ID игры."
           }
         },
         "zh-Hans" : {
@@ -10914,6 +11136,12 @@
             "value" : "Non scelto"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не выбрано"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10928,6 +11156,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Non installato"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не установлено"
           }
         },
         "zh-Hans" : {
@@ -11782,6 +12016,12 @@
             "value" : "Gioca"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Играть"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11798,6 +12038,12 @@
             "value" : "Gioca a %@"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Играть в %@"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11812,6 +12058,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ora Gioca avvia %@."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Теперь «Играть» запускает %@."
           }
         },
         "zh-Hans" : {
@@ -11982,6 +12234,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Programma"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Программа"
           }
         },
         "zh-Hans" : {
@@ -12792,6 +13050,12 @@
             "value" : "Rimuovi %@"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить %@"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12806,6 +13070,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rimuovere %@?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить %@?"
           }
         },
         "zh-Hans" : {
@@ -12934,6 +13204,12 @@
             "value" : "Rimuovi gioco"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить игру"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12948,6 +13224,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rimuovi gioco…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить игру…"
           }
         },
         "zh-Hans" : {
@@ -13074,6 +13356,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ rimosso."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ удалена."
           }
         },
         "zh-Hans" : {
@@ -13862,6 +14150,12 @@
             "value" : "Esegui programma di installazione…"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запустить установщик…"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13944,6 +14238,12 @@
             "value" : "Esegui il programma di installazione del gioco selezionato nel suo prefisso."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запустить установщик выбранной игры в её собственном префиксе."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14004,6 +14304,12 @@
             "value" : "Salva %@"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить %@"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14018,6 +14324,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Salvate in gamefixes/%@.conf. Le opzioni di avvio impostate per questo gioco in Steam hanno la precedenza su queste."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранено в gamefixes/%@.conf. Параметры запуска этой игры в Steam имеют приоритет."
           }
         },
         "zh-Hans" : {
@@ -14210,6 +14522,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Impostato su %@ dalle opzioni di avvio di Steam di questo gioco, che hanno la precedenza su questa scelta."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Задано как %@ параметрами запуска этой игры в Steam, которые имеют приоритет над этим выбором."
           }
         },
         "zh-Hans" : {
@@ -14536,6 +14854,12 @@
             "value" : "Mostra FPS"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать FPS"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14616,6 +14940,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostra la frequenza dei fotogrammi in una piccola finestra sopra il gioco quando premi Gioca. Conta i fotogrammi disegnati dal Direct3D di Wine (wined3d), quindi i giochi su D3DMetal, DXMT o DXVK non mostrano alcun numero."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать частоту кадров в маленьком окне поверх игры после нажатия «Играть». Считаются кадры, которые рисует собственный Direct3D Wine (wined3d), поэтому для игр на D3DMetal, DXMT или DXVK число не отображается."
           }
         },
         "zh-Hans" : {
@@ -15118,6 +15448,12 @@
             "value" : "Avvia il gioco selezionato."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запустить выбранную игру."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15156,6 +15492,12 @@
             "value" : "Avviato %1$@ in %2$@. Al termine, scegli il programma che avvia il gioco."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ запущен в %@. Когда он завершится, выберите программу, которая запускает игру."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15170,6 +15512,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ avviato."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ запущена."
           }
         },
         "zh-Hans" : {
@@ -16223,6 +16571,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Interrompi il gioco selezionato quando si blocca e non si chiude."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Остановить выбранную игру, если она зависла и не закрывается."
           }
         },
         "zh-Hans" : {
@@ -17603,6 +17957,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questo elimina il prefisso del gioco, con tutto ciò che vi è installato o salvato. Una cartella del gioco fuori dal prefisso, ad esempio in Download, viene conservata. Per tenerlo, esegui prima il backup del prefisso in Prefissi."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Префикс игры будет удалён вместе со всем, что в нём установлено или сохранено. Папка игры вне префикса, например в «Загрузках», останется. Чтобы сохранить префикс, сначала сделайте его резервную копию на странице «Префиксы»."
           }
         },
         "zh-Hans" : {
