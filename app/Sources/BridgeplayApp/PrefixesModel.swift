@@ -49,6 +49,7 @@ final class PrefixesModel {
         case rebuild([WinePrefix], InstalledTool)
         case backUp([WinePrefix])
         case deleteBackups([PrefixBackup])
+        case forceQuit(WinePrefix)
     }
 
     var selectedPrefix: WinePrefix? {
@@ -64,6 +65,7 @@ final class PrefixesModel {
     private let installedTools: @Sendable () -> [InstalledTool]
     private let rebuild: @Sendable (WinePrefix, InstalledTool, Bool) throws -> URL?
     private let makeBackup: @Sendable (WinePrefix) throws -> URL
+    private let stop: @Sendable (WinePrefix) throws -> Bool
 
     init(
         libraries: @escaping @Sendable () -> [SteamLibrary] = { PrefixStore.libraries() + [GameStore.library] },
@@ -73,12 +75,14 @@ final class PrefixesModel {
         },
         makeBackup: @escaping @Sendable (WinePrefix) throws -> URL = {
             try PrefixTools.backUp($0)
-        }
+        },
+        stop: @escaping @Sendable (WinePrefix) throws -> Bool = { try PrefixTools.forceQuit($0) }
     ) {
         self.libraries = libraries
         self.installedTools = installedTools
         self.rebuild = rebuild
         self.makeBackup = makeBackup
+        self.stop = stop
     }
 
     private var loadGeneration = 0
@@ -167,6 +171,17 @@ final class PrefixesModel {
             guard let first = saved.first else { return nil }
             guard saved.count == 1 else { return String(localized: "Backed up \(saved.count) prefixes.") }
             return String(localized: "Backed up the prefix for \(first.prefix.title).")
+        }
+    }
+
+    // For a game that hangs, Steam's own or a shortcut such as a launcher app adds, which the
+    // Games page does not list.
+    func forceQuit(_ prefix: WinePrefix) async {
+        await eachInTurn([prefix], stop) { done in
+            guard let step = done.first else { return nil }
+            return step.made
+                ? String(localized: "Force quit \(prefix.title).")
+                : String(localized: "\(prefix.title) is not running.")
         }
     }
 

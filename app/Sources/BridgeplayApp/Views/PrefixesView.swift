@@ -109,6 +109,21 @@ struct PrefixesView: View {
         } message: {
             Text(PrefixPrompt.backUpMessage(backingUp))
         }
+        .confirmationDialog(
+            String(localized: "Force quit \(quitting?.title ?? "")?"),
+            isPresented: asking(.forceQuit),
+            titleVisibility: .visible,
+            presenting: quitting
+        ) { prefix in
+            Button("Force Quit", role: .destructive) {
+                model.pendingConfirmation = nil
+                Task { await model.forceQuit(prefix) }
+            }
+            Button("Cancel", role: .cancel) { model.pendingConfirmation = nil }
+                .keyboardShortcut(.defaultAction)
+        } message: { _ in
+            Text("Every program in the game's prefix is stopped at once, including its launcher. Progress the game has not saved is lost.")
+        }
         .alert(
             "Winetricks",
             isPresented: Binding(
@@ -134,7 +149,7 @@ struct PrefixesView: View {
     }
 
     private enum Question {
-        case delete, rebuild, backUp
+        case delete, rebuild, backUp, forceQuit
     }
 
     private var deleting: [WinePrefix] {
@@ -157,11 +172,17 @@ struct PrefixesView: View {
         return []
     }
 
+    private var quitting: WinePrefix? {
+        if case .forceQuit(let prefix) = model.pendingConfirmation { return prefix }
+        return nil
+    }
+
     private func isAsking(_ question: Question) -> Bool {
         switch (question, model.pendingConfirmation) {
         case (.delete, .delete): true
         case (.rebuild, .rebuild(_, _)): true
         case (.backUp, .backUp): true
+        case (.forceQuit, .forceQuit): true
         default: false
         }
     }
@@ -196,6 +217,12 @@ struct PrefixesView: View {
         }
         .disabled(model.selectedPrefix == nil)
         .help("Show the selected prefix in the Finder.")
+
+        Button("Force Quit", systemImage: "xmark.octagon") {
+            if let prefix = model.selectedPrefix { model.pendingConfirmation = .forceQuit(prefix) }
+        }
+        .disabled(model.selectedPrefix == nil || model.isBusy)
+        .help("Stop the selected game when it hangs and will not close.")
 
         Button("Refresh", systemImage: "arrow.clockwise") {
             Task { await model.load() }
@@ -358,6 +385,7 @@ struct PrefixesView: View {
                 Divider()
                 toolButtons(for: prefix)
                 Divider()
+                Button("Force Quit…") { model.pendingConfirmation = .forceQuit(prefix) }
                 Button("Reveal in Finder") { model.reveal(prefix) }
                 Menu("Open Log") {
                     ForEach(PrefixLog.allCases, id: \.self) { log in

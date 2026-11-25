@@ -178,6 +178,11 @@ struct BridgeplayApp: App {
 
             Divider()
 
+            Button("Force Quit…") {
+                if let prefix = prefixTarget { prefixes.pendingConfirmation = .forceQuit(prefix) }
+            }
+            .disabled(prefixTarget == nil)
+
             Button("Reveal in Finder") {
                 if let prefix = prefixes.selectedPrefix { prefixes.reveal(prefix) }
             }

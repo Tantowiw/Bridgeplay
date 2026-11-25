@@ -393,6 +393,36 @@ struct PrefixesModelTests {
         #expect(model.outcome?.contains("The original is at") == true)
     }
 
+    // A Steam game or a shortcut that hangs is listed only here, not on the Games page.
+    @Test("Force Quit says whether the game was stopped, and reports a failure")
+    func forceQuitReportsTheOutcome() async throws {
+        let (dir, library) = try makeLibrary(appIDs: ["3795902015", "1574480"])
+        defer { try? FileManager.default.removeItem(at: dir) }
+
+        let running = Asked()
+        let model = PrefixesModel(
+            libraries: { [library] },
+            stop: { prefix in
+                if prefix.appID == "1574480" { throw StepFailure(step: "Force Quit", detail: "still running") }
+                defer { running.add(prefix.appID, "", false) }
+                return running.calls.isEmpty
+            })
+        await model.load()
+        let game = try #require(model.prefixes.first { $0.appID == "3795902015" })
+        let stuck = try #require(model.prefixes.first { $0.appID == "1574480" })
+
+        model.pendingConfirmation = .forceQuit(game)
+        model.pendingConfirmation = nil
+        await model.forceQuit(game)
+        #expect(model.outcome == String(localized: "Force quit \(game.title)."))
+        await model.forceQuit(game)
+        #expect(model.outcome == String(localized: "\(game.title) is not running."))
+        await model.forceQuit(stuck)
+        #expect(model.outcome == nil)
+        #expect(model.report != nil)
+        #expect(!model.isBusy)
+    }
+
     @Test("Backing up reports where the copy landed")
     func backUpReportsTheSlot() async throws {
         let (dir, library) = try makeLibrary(appIDs: ["1574480", "1649240"])
