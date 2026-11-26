@@ -41,6 +41,16 @@ This fork lets Bridgeplay play Windows games that are not on Steam, and fixes a 
 
 The fork's strings are translated like the rest of the app: English, Italian, Russian and Simplified Chinese.
 
+### Tested with this fork
+
+These are one person's results on one Apple Silicon Mac, not a promise. Other games are on the upstream [compatibility list](https://bridgeplay.dev/compatibility).
+
+| Game | Result | Notes |
+|---|---|---|
+| Digimon SuperRumble (online, XIGNCODE) | Logged in and played | Runs as a Steam shortcut to the official launcher on D3DMetal. That is upstream Bridgeplay's own shortcut path; the fork only adds Force Quit on the Prefixes page for when it hangs. The website's **GAME START** button needs a `dsropen:` link handler, which is not in this repository yet. |
+
+**Online games are at your own risk.** XIGNCODE let the game start here, but it can change that at any time. Like upstream, this fork can't promise that anti-cheat won't flag or ban your account. See [Online games and anti-cheat](#online-games-and-anti-cheat).
+
 ### Installing this fork
 
 1. Build it on an Apple Silicon Mac with Xcode 27 ([docs/BUILD-LOCAL.md](docs/BUILD-LOCAL.md)):
