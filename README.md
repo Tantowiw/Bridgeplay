@@ -17,11 +17,45 @@
 
 > **Bridgeplay is a fork of [NotProton](https://github.com/NotProtonNot/NotProton)** by NotProtonNot. Games run on CodeWeavers' open-source Wine, the engine behind [CrossOver](https://www.codeweavers.com/crossover), and Apple's Game Porting Toolkit. I'm not affiliated with either. If CrossOver works for you, buy it: that money is a big part of what keeps Wine on the Mac moving. Bridgeplay is a hobby project I maintain part-time, so support is best-effort. Full list in [Credits](#credits) and [Support Wine](#support-wine).
 
+> [!NOTE]
+> **This is a personal fork of [raymondchins/Bridgeplay](https://github.com/raymondchins/Bridgeplay).** It adds a Games page for Windows games that are not on Steam, plus a few WineCX fixes. See [About this fork](#about-this-fork). It has no signed download: you build it yourself. For everything else, use the official Bridgeplay from [bridgeplay.dev](https://bridgeplay.dev).
+
 <br>
 
 <p align="center">
   <img src="docs/readme/bento-v5.png" alt="What Bridgeplay does: plays inside Mac Steam, experimental frame generation, DLSS answered by MetalFX, DirectX 12 on Metal, any controller, full Retina one switch away, guided install" width="100%">
 </p>
+
+## About this fork
+
+This fork lets Bridgeplay play Windows games that are not on Steam, and fixes a few things in the WineCX engine found along the way. Everything else is upstream Bridgeplay. The fork's commits are rebased onto each upstream release. The current branch is [`feat/standalone-ui-main`](https://github.com/Tantowiw/Bridgeplay/tree/feat/standalone-ui-main), based on upstream `main` after 0.7.67.
+
+| | |
+|---|---|
+| **Games page** (⌘2) | Windows games that are not on Steam. **New Game** takes a name and a compatibility tool, then runs the game's installer in its own prefix. **Choose Program** sets what **Play** starts, from inside the prefix or from a folder unpacked anywhere. Games are kept in `~/Library/Application Support/bridgeplay-games`, which **Remove Everything** leaves alone. |
+| **Game Settings** | Graphics backend, Metal HUD, MSync, high resolution and frame generation for a game that has no Bridgeplay panel in Steam. The settings go into the game's `gamefixes/<appid>.conf`, and the sheet says where a Steam launch option overrides one of them. |
+| **Force Quit** | Stops every process in a hung game's prefix (`wineserver -k`). It is on the Games page, and on the Prefixes page for Steam games and shortcuts. |
+| **FPS window** | A small frame counter over the game, for games that wined3d draws through OpenGL. Metal HUD and DXVK's HUD can't see those games. |
+| **Standalone run script** | `BRIDGEPLAY_STANDALONE=1` runs a game without Steam's client. Steamclient, the overlay and `Steam.dll` are left out; only `steam.exe` is staged, so the script can wait for every process the game starts. |
+| **WineCX 11.17 fixes** | Legacy OpenGL contexts now get their extensions: Wine commit 1c2d9098 is backported into `win32u`. WMI now reports a system-managed page file (patched `wbemprox`), so games that refused to start with "Insufficient memory or disk space" can start. Sources, recipes and pins are in [`win32u-patch/`](win32u-patch/), [`wbemprox-patch/`](wbemprox-patch/) and [docs/WINECX.md](docs/WINECX.md). |
+
+The fork's strings are translated like the rest of the app: English, Italian, Russian and Simplified Chinese.
+
+### Installing this fork
+
+1. Build it on an Apple Silicon Mac with Xcode 27 ([docs/BUILD-LOCAL.md](docs/BUILD-LOCAL.md)):
+   ```sh
+   git clone -b feat/standalone-ui-main https://github.com/Tantowiw/Bridgeplay.git
+   cd Bridgeplay
+   scripts/build-local.sh
+   ```
+2. Quit Steam. Replace `/Applications/Bridgeplay.app` with `build/Bridgeplay.app`, then open it.
+3. The build is signed ad hoc, so macOS forgets its App Management permission after every new build. In **System Settings › Privacy & Security › App Management**, remove Bridgeplay with − and add it again with +. Then click **Install** on the Status page. With Steam closed, `/Applications/Bridgeplay.app/Contents/MacOS/BridgeplayApp --install-into-steam` does the same thing.
+
+Things to know:
+
+- **Upstream updates replace the fork.** The app keeps upstream's update feed. When upstream releases a new version, Sparkle installs the official app over this one, and the Games page disappears. Your games and their prefixes stay in `bridgeplay-games`, but you can't play them until you rebuild from this fork, after it has been rebased onto that release.
+- **Report problems with the fork's features here**, in this repository's issues, not upstream's. Upstream has nothing to do with them.
 
 ## What it does
 
